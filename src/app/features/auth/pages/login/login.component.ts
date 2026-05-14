@@ -19,6 +19,7 @@ export class LoginComponent {
 
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  isPasswordVisible = signal<boolean>(false);
 
   loginForm: FormGroup = this.fb.group({
     phone: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],

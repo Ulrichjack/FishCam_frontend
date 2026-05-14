@@ -1,0 +1,91 @@
+<aside class="flex flex-col w-64 h-screen bg-fc-white border-r border-fc-border fixed">
+
+  <!-- Logo -->
+  <div class="h-16 flex items-center px-6 border-b border-fc-border">
+            <img src="assets/logo.svg"
+             alt="Fish-Cam"
+             class="h-40 w-auto"
+             style="object-fit:contain" />
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex-1 py-4 space-y-1 overflow-y-auto">
+
+    <a routerLink="/dashboard"
+       routerLinkActive="border-l-4 border-fc-green bg-fc-green-light text-fc-green font-semibold"
+       [routerLinkActiveOptions]="{exact: true}"
+       class=" flex items-center rounded-md px-6 py-3 font-medium capitalize lg:my-1 2xl:mx-5 2xl:my-2 text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-700/90">
+      <lucide-icon name="layout-dashboard" class="mr-3 h-5 w-5"></lucide-icon>
+      Tableau de bord
+    </a>
+
+     @if(authStore.isPatron() || authStore.isSuperAdmin()) {
+      <a routerLink="/dettes"
+         routerLinkActive="border-l-4 border-fc-red bg-fc-red-light text-fc-red font-semibold"
+         class=" flex items-center rounded-md px-6 py-3 font-medium capitalize lg:my-1 2xl:mx-5 2xl:my-2 text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-700/90">
+        <lucide-icon name="alert-triangle" class="mr-3 h-5 w-5 text-fc-red"></lucide-icon>
+        Comptes en dette
+      </a>
+
+      <a routerLink="/equipe"
+         routerLinkActive="border-l-4 border-fc-green bg-fc-green-light text-fc-green font-semibold"
+         class=" flex items-center rounded-md px-6 py-3 font-medium capitalize lg:my-1 2xl:mx-5 2xl:my-2 text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-700/90">
+        <lucide-icon name="user-cog" class="mr-3 h-5 w-5"></lucide-icon>
+        Équipe
+      </a>
+    }
+
+    @if(authStore.isSuperAdmin()) {
+      <a routerLink="/poissonneries"
+         routerLinkActive="border-l-4 border-fc-green bg-fc-green-light text-fc-green font-semibold"
+         class=" flex items-center rounded-md px-6 py-3 font-medium capitalize lg:my-1 2xl:mx-5 2xl:my-2 text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-700/90">
+        <lucide-icon name="building-2" class="mr-3 h-5 w-5"></lucide-icon>
+        Poissonneries
+      </a>
+    }
+
+
+    <a routerLink="/clients"
+       routerLinkActive="border-l-4 border-fc-green bg-fc-green-light text-fc-green font-semibold"
+       class=" flex items-center rounded-md px-6 py-3 font-medium capitalize lg:my-1 2xl:mx-5 2xl:my-2 text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-700/90">
+      <lucide-icon name="users" class="mr-3 h-5 w-5"></lucide-icon>
+      Clients
+    </a>
+
+    <a routerLink="/transactions"
+       routerLinkActive="border-l-4 border-fc-green bg-fc-green-light text-fc-green font-semibold"
+       class=" flex items-center rounded-md px-6 py-3 font-medium capitalize lg:my-1 2xl:mx-5 2xl:my-2 text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-700/90">
+      <lucide-icon name="arrow-left-right" class="mr-3 h-5 w-5"></lucide-icon>
+      Transactions
+    </a>
+
+    <a routerLink="/notifications"
+       routerLinkActive="border-l-4 border-fc-green bg-fc-green-light text-fc-green font-semibold"
+       class=" flex items-center rounded-md px-6 py-3 font-medium capitalize lg:my-1 2xl:mx-5 2xl:my-2 text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-700/90">
+      <lucide-icon name="bell" class="mr-3 h-5 w-5"></lucide-icon>
+      Notifications
+    </a>
+
+
+  </nav>
+
+  <!-- Profil & Déconnexion -->
+  <div class="p-4 border-t border-fc-border bg-fc-bg">
+    <!-- <div class="flex items-center mb-4">
+      <div class="w-10 h-10 rounded-full bg-fc-green text-fc-white flex items-center justify-center font-bold mr-3 shrink-0">
+        {{ authStore.user()?.lastName?.substring(0, 2)?.toUpperCase() || 'FU' }}
+      </div>
+      <div class="flex flex-col overflow-hidden">
+        <span class="text-sm font-semibold text-fc-text truncate">{{ authStore.user()?.lastName }}</span>
+        <span class="text-xs text-fc-text-muted uppercase">{{ authStore.user()?.role }}</span>
+      </div>
+    </div> -->
+
+    <button (click)="logout()"
+            class="w-full flex items-center justify-center p-2 text-fc-red hover:bg-fc-red-light rounded-md transition">
+      <lucide-icon name="log-out" class="w-4 h-4 mr-2"></lucide-icon>
+      Déconnexion
+    </button>
+  </div>
+
+</aside>

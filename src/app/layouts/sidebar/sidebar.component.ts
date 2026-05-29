@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Router, RouterLinkActive } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthStore } from '../../core/stores/auth.store';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [LucideAngularModule, RouterLinkActive],
+  imports: [LucideAngularModule, RouterLink,RouterLinkActive],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -14,6 +14,7 @@ import { AuthStore } from '../../core/stores/auth.store';
 export class SidebarComponent {
 
     public readonly authStore = inject(AuthStore);
+    readonly closeRequested = output<void>();
     private router = inject(Router);
 
     logout(){

@@ -2,6 +2,15 @@
 @import "tailwindcss";
 @source "./**/*.{html,ts}";
 
+a[routerLink].sidebar-link-active {
+  color: var(--color-fc-green);
+  font-weight: 600; /* semibold */
+}
+a[routerLink].sidebar-link-active-danger {
+  color: var(--color-fc-red);
+  font-weight: 600; /* semibold */
+}
+
 @theme{
     --color-fc-green: #185216;
     --color-fc-green-light: #E8F5E9;

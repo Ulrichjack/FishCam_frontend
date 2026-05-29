@@ -1,45 +1,72 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { DashboardService } from '../services/dashboard.service';
 import { StatistiquesPoissonnerieResponse } from '../../../core/models/statistiques.model';
-import { firstValueFrom } from 'rxjs';
 import { CompteCourantResponse } from '../../../core/models/compte-courant.model';
+import { firstValueFrom } from 'rxjs';
+import { NotificationResponse } from '../../../core/models/notification.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardStore {
-  
+
   private dashboardService = inject(DashboardService);
 
   // --- STATE SIGNALS ---
-  stats = signal<StatistiquesPoissonnerieResponse | null>(null);
-  debtors = signal<CompteCourantResponse []>([]);
-  isLoading = signal<boolean>(false);
-  error = signal<string | null>(null);
+  private readonly _stats = signal<StatistiquesPoissonnerieResponse | null>(null);
+  private readonly _debtors = signal<CompteCourantResponse[]>([]);
+  private readonly _notifications = signal<NotificationResponse[]>([]); // <-- 1. ADDED
+  private readonly _isLoading = signal<boolean>(false);
+  private readonly _error = signal<string | null>(null);
+  private readonly _unreadCount = signal<number>(0);
+
+  readonly unreadCount = this._unreadCount.asReadonly();
+  readonly stats = this._stats.asReadonly();
+  readonly debtors = this._debtors.asReadonly();
+  readonly notifications = this._notifications.asReadonly(); // <-- 2. ADDED
+  readonly isLoading = this._isLoading.asReadonly();
+  readonly error = this._error.asReadonly();
+
+  // --- COMPUTED SIGNALS ---
+  // 3. ADDED: This automatically finds the daily report!
+  readonly lastReport = computed(() =>
+    this.notifications().find((n: NotificationResponse) => n.type === 'RAPPORT_JOURNALIER')
+  );
 
   // --- ACTIONS ---
-  async loadStats(poissonnerieId: number) {
-    // 1. TODO: Set isLoading to true, and error to null
-    this.isLoading.set(true);
-    this.error.set(null);
+  // 4. ADDED: We now require userId as a parameter
+  async loadStats(poissonnerieId: number, userId: number) {
+    this._isLoading.set(true);
+    this._error.set(null);
 
     try {
-      // 2. TODO: Await the service call using firstValueFrom
-      // Hint: const response = await firstValueFrom(this.dashboardService.getStats(poissonnerieId));
-      const response = await firstValueFrom(this.dashboardService.getStats(poissonnerieId));
-      const responseCompteCourant = await firstValueFrom(this.dashboardService.getDebtors(poissonnerieId));
-      
-      // 3. TODO: Update the stats signal with response.data, and set isLoading to false
-      this.stats.set(response.data);
-      this.debtors.set(responseCompteCourant.data);
-      this.isLoading.set(false);
+      const [statsResponse, debtorsResponse, notificationsResponse, unreadResponse] = await Promise.all([
+        firstValueFrom(this.dashboardService.getStats(poissonnerieId)),
+        firstValueFrom(this.dashboardService.getDebtors(poissonnerieId)),
+        firstValueFrom(this.dashboardService.getNotifications(userId)),
+        firstValueFrom(this.dashboardService.getUnreadCount(userId)),
+      ]);
+
+      this._stats.set(statsResponse.data);
+      this._debtors.set(debtorsResponse.data);
+      this._notifications.set(notificationsResponse.data);
+      this._unreadCount.set(unreadResponse.data?.count ?? 0);
 
     } catch (err) {
-      // 4. TODO: Set the error signal to a message, and set isLoading to false
-      this.error.set('Failed to load statistics');
-      this.isLoading.set(false);
+      this._error.set('Failed to load dashboard data');
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+async loadUnreadCountOnly(userId: number) {
+    try {
+      const res = await firstValueFrom(this.dashboardService.getUnreadCount(userId));
+      this._unreadCount.set(res.data?.count ?? 0);
+    } catch {
+      this._unreadCount.set(0);
     }
   }
 
-
+  
 }
+

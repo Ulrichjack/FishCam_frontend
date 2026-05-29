@@ -7,13 +7,26 @@ export const authGuard: CanActivateFn = (route, state) => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
 
-  // TODO: Check if the user is logged in using your authStore
-  // Hint: Use authStore.isLoggedIn()
-  if (authStore.isLoggedIn()) {
-    return true; // Access granted!
+  const isLoggedIn = authStore.isLoggedIn();
+  const isGoingToLogin = state.url === '/login';
+
+  // CASE A: Logged in AND trying to go to login page
+  if (isLoggedIn && isGoingToLogin) {
+    router.navigate(['/dashboard']);
+    return false;
   }
 
-  // If not logged in, redirect to login page
+  // CASE B: Logged in and going anywhere else
+  if (isLoggedIn) {
+    return true;
+  }
+
+  // CASE C: Not logged in AND trying to go to login page
+  if ( !isLoggedIn && isGoingToLogin){
+    return true;
+  }
+
+  // CASE D: Not logged in and going anywhere else
   router.navigate(['/login']);
-  return false; // Access denied!
+  return false;
 };

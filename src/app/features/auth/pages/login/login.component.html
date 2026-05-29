@@ -29,7 +29,7 @@
         <h1 class="font-['Lexend',sans-serif] text-[2rem] font-extrabold
                    leading-tight text-gray-900">
           Accès au système<br>
-          <span fc-text-brand>de gestion.</span>
+          <span class="text-fc-green" >de gestion.</span>
         </h1>
         <p class="mt-3 text-sm text-gray-500 leading-relaxed">
           Connectez-vous avec vos identifiants pour accéder
@@ -88,7 +88,7 @@
           </div>
           <div class="fc-input-wrap"
                 [class.fc-input-error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-              
+
               <!-- Lock Icon -->
               <svg class="mx-3 h-4 w-4 shrink-0 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
                 <path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-72-56a8,8,0,1,1-8-8A8,8,0,0,1,136,152Z"/>
@@ -96,14 +96,14 @@
 
               <!-- Input AND Button Wrapper -->
               <div class="flex flex-1 items-center pr-2">
-                
-                <input [type]="isPasswordVisible() ? 'text' : 'password'" 
-                      id="password" 
+
+                <input [type]="isPasswordVisible() ? 'text' : 'password'"
+                      id="password"
                       formControlName="password"
-                      placeholder="••••••••" 
+                      placeholder="••••••••"
                       autocomplete="current-password"
                       class="fc-input" />
-                
+
                 <button type="button"
                         (click)="isPasswordVisible.set(!isPasswordVisible())"
                         class="p-2 focus:outline-none text-gray-400 hover:text-gray-600 transition-colors">

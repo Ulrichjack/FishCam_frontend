@@ -1,3 +1,30 @@
-<app-stats-row></app-stats-row>
+<div class="flex flex-col gap-6">
 
-<app-alert-ribbon></app-alert-ribbon>
+  <!-- 1. The Stats Row (Top) -->
+  <app-stats-row></app-stats-row>
+
+  <!-- 2. The Alert Ribbon (Middle) -->
+  <app-alert-ribbon></app-alert-ribbon>
+
+  <!-- 3. The Bottom Section (Split 60/40) -->
+  <!-- We only show this section if the stats are loaded to prevent crashes -->
+  @if (store.stats()) {
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+      <!-- Left Side: Daily Report (Takes 3 columns on large screens) -->
+      <div class="lg:col-span-3">
+        <!-- We pass the message from the store to the Dumb component -->
+        <app-daily-report-card
+          [reportMessage]="store.lastReport()?.message || 'Aucun rapport disponible pour aujourd\'hui.'">
+        </app-daily-report-card>
+      </div>
+
+      <!-- Right Side: Notifications (Takes 2 columns on large screens) -->
+      <div class="lg:col-span-2">
+        <app-notification-preview></app-notification-preview>
+      </div>
+
+    </div>
+  }
+
+</div>

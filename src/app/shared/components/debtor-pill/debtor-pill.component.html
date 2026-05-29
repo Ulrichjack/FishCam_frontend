@@ -1,10 +1,13 @@
-<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium mr-2"
-     [ngClass]="colorClasses()">
-  
-  <lucide-icon name="alert-triangle" class="h-4 w-4"></lucide-icon>
-  
-  <span>{{ debtor().client.firstName }} {{ debtor().client.lastName }}</span>
-  <span>·</span>
-  <span class="font-bold">{{ debtor().solde }} FCFA</span>
+<!-- The main pill container -->
+<div class="inline-flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full font-medium text-xs sm:text-sm"
+     [ngClass]="pillBackgroundClass()">
+
+  <!-- The new status circle -->
+  <div class="h-2 w-2 rounded-full" [ngClass]="statusCircleClass()"></div>
+
+  <!-- Debtor Info -->
+  <span class="font-semibold text-red-600">{{ debtor().client.firstName }} {{ debtor().client.lastName }}</span>
+  <span class="opacity-50">·</span>
+  <span class="font-bold ">{{ debtor().solde | number }} FCFA</span>
 
 </div>

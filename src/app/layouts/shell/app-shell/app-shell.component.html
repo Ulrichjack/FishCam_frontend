@@ -1,11 +1,27 @@
-<div class="flex h-screen bg-fc-bg font-sans">
-  <app-sidebar></app-sidebar>
+<div class="flex min-h-screen bg-fc-bg font-sans">
 
-  <div class="flex-1 flex flex-col overflow-hidden ml-64">
-    <!-- Replace the comment with the tag! -->
-    <app-topbar></app-topbar>
+  <!-- Desktop sidebar -->
+  <div class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-30 lg:block lg:w-64">
+    <app-sidebar></app-sidebar>
+  </div>
 
-    <main class="flex-1 overflow-x-hidden overflow-y-auto p-8">
+  <!-- Mobile overlay + drawer -->
+  @if (isSidebarOpen()) {
+    <div class="fixed inset-0 z-40 bg-black/40 lg:hidden" (click)="closeSidebar()"></div>
+
+    <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl lg:hidden">
+      <app-sidebar (closeRequested)="closeSidebar()"></app-sidebar>
+    </div>
+  }
+
+  <!-- Main content -->
+  <div class="flex-1 flex flex-col overflow-hidden lg:ml-64">
+    <app-topbar
+      [unreadCount]="notificationStore.unreadCount()"
+      (mobileMenuClicked)="openSidebar()">
+    </app-topbar>
+
+    <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
       <router-outlet></router-outlet>
     </main>
   </div>

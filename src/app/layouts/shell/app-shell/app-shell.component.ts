@@ -8,7 +8,7 @@ import { NotificationStore } from '../../../features/notifications/stores/notifi
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [SidebarComponent, RouterOutlet,SidebarComponent, TopbarComponent, RouterOutlet],
+  imports: [SidebarComponent, RouterOutlet, TopbarComponent, RouterOutlet],
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -26,7 +26,7 @@ export class AppShellComponent  {
     effect(() => {
       const userId = this.auth.user()?.id;
       if (!userId) return;
-      this.notificationStore.refreshAll(userId);
+      this.notificationStore.refreshShell(userId);
     });
   }
 }

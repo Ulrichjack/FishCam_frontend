@@ -15,7 +15,7 @@
       <div class="lg:col-span-3">
         <!-- We pass the message from the store to the Dumb component -->
         <app-daily-report-card
-          [reportMessage]="store.lastReport()?.message || 'Aucun rapport disponible pour aujourd\'hui.'">
+          [reportMessage]="notificationStore.dailyReport()?.message || 'Aucun rapport disponible pour aujourd\'hui.'">
         </app-daily-report-card>
       </div>
 

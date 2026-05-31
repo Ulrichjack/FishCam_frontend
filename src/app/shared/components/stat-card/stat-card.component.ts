@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 
@@ -7,6 +7,7 @@ import { LucideAngularModule } from 'lucide-angular';
   standalone: true,
   imports: [NgClass, LucideAngularModule],
   templateUrl: './stat-card.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StatCardComponent {
   // --- SIGNAL INPUTS ---

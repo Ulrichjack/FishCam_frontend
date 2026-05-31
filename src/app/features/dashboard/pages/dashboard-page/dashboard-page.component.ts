@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { DashboardStore } from '../../stores/dashboard.store';
 import { AuthStore } from '../../../../core/stores/auth.store';
-import { StatsRowComponent } from '../../Components/stats-row/stats-row.component';
-import { AlertRibbonComponent } from '../../Components/alert-ribbon/alert-ribbon.component';
-import { NotificationPreviewComponent } from '../../Components/notification-preview/notification-preview.component';
-import { DailyReportCardComponent } from '../../Components/daily-report-card/daily-report-card.component';
+import { StatsRowComponent } from '../../components/stats-row/stats-row.component';
+import { AlertRibbonComponent } from '../../components/alert-ribbon/alert-ribbon.component';
+import { NotificationPreviewComponent } from '../../components/notification-preview/notification-preview.component';
+import { DailyReportCardComponent } from '../../components/daily-report-card/daily-report-card.component';
+import { NotificationStore } from '../../../notifications/stores/notification.store';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,14 +18,16 @@ export class DashboardPageComponent implements OnInit {
 
   readonly store = inject(DashboardStore);
   private readonly auth = inject(AuthStore);
+  readonly notificationStore = inject(NotificationStore);
+
 
   ngOnInit() {
      const poissonnerieId = this.auth.user()?.poissonnerieId;
-    const userId = this.auth.user()?.id; // <-- Get the user ID
+    console.log('dashboard init', { poissonnerieId});
 
     // Pass BOTH IDs to the store
-    if (poissonnerieId && userId) {
-      this.store.loadStats(poissonnerieId, userId);
+    if (poissonnerieId) {
+      this.store.loadStats(poissonnerieId);
     }
   }
 

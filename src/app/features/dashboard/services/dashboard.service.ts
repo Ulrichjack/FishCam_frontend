@@ -27,15 +27,6 @@ export class DashboardService {
     return this.http.get<ApiResponse<CompteCourantResponse[]>>(`${environment.apiUrl}/comptes-courants/poissonnerie/${poissonnerieId}/en-dette`);
   }
 
-  getNotifications(userId: number) {
-    // Note: Adjust the URL if your backend uses a different path!
-    return this.http.get<ApiResponse<NotificationResponse[]>>(`${environment.apiUrl}/notifications/user/${userId}`);
-  }
-
-  getUnreadCount(userId: number) {
-  return this.http.get<ApiResponse<{ count: number }>>(
-    `${environment.apiUrl}/notifications/user/${userId}/unread-count`
-  );
-}
+ 
 
 }

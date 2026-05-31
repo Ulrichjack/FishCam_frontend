@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DashboardStore } from '../../stores/dashboard.store';
 import { DatePipe } from '@angular/common';
+import { NotificationStore } from '../../../notifications/stores/notification.store';
 
 @Component({
   selector: 'app-notification-preview',
@@ -12,16 +12,7 @@ import { DatePipe } from '@angular/common';
 })
 export class NotificationPreviewComponent {
 
-  readonly store = inject(DashboardStore);
-
-  // We filter out the daily report (because it has its own card)
-  // and we only take the first 3 notifications to keep the UI clean.
-  readonly recentNotifications = computed(() => {
-    return this.store.notifications()
-      .filter(n => n.type !== 'RAPPORT_JOURNALIER')
-      .slice(0, 3);
-  });
-
+  readonly store = inject(NotificationStore);
   // Helper method to get the right color based on the type
   getColorForType(type: string): string {
   switch (type) {

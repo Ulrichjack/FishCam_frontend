@@ -1,30 +1,42 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ApiResponse } from '../../../core/models/api-response.model';
-import { NotificationResponse } from '../../../core/models/notification.model';
 import { environment } from '../../../../environments/environment';
+import { ApiResponse, PageResponse } from '../../../core/models/api-response.model';
+import { NotificationResponse } from '../../../core/models/notification.model';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/notifications`;
+  private readonly baseUrl = `${environment.apiUrl}/notifications`;
 
+  getNotificationsPage(userId: number, page = 0, size = 20) {
+    return this.http.get<ApiResponse<PageResponse<NotificationResponse>>>(
+      `${this.baseUrl}/user/${userId}/page?page=${page}&size=${size}`
+    );
+  }
 
-  getNotifications(userId: number) {
+  getRecent(userId: number, limit = 5) {
     return this.http.get<ApiResponse<NotificationResponse[]>>(
-      `${this.apiUrl}/user/${userId}`
+      `${this.baseUrl}/user/${userId}/recent?limit=${limit}`
     );
   }
 
   getUnreadCount(userId: number) {
     return this.http.get<ApiResponse<{ count: number }>>(
-      `${this.apiUrl}/user/${userId}/unread-count`
+      `${this.baseUrl}/user/${userId}/unread-count`
     );
   }
 
   markAsRead(notificationId: number) {
     return this.http.put<ApiResponse<void>>(
-      `${this.apiUrl}/${notificationId}/mark-as-read`,
+      `${this.baseUrl}/${notificationId}/mark-as-read`,
+      {}
+    );
+  }
+
+  markAllAsRead(userId: number) {
+    return this.http.put<ApiResponse<{ updated: number }>>(
+      `${this.baseUrl}/user/${userId}/mark-all-as-read`,
       {}
     );
   }

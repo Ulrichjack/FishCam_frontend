@@ -17,6 +17,7 @@
   <!-- Main content -->
   <div class="flex-1 flex flex-col overflow-hidden lg:ml-64">
     <app-topbar
+      [pageTitle]="currentTitle()"
       [unreadCount]="notificationStore.unreadCount()"
       (mobileMenuClicked)="openSidebar()">
     </app-topbar>

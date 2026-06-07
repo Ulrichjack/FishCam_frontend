@@ -1,10 +1,10 @@
+import { FactureResponse } from './../../../core/models/facture';
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { StatistiquesPoissonnerieResponse } from '../../../core/models/statistiques.model';
 import { CompteCourantResponse } from '../../../core/models/compte-courant.model';
-import { NotificationResponse } from '../../../core/models/notification.model';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +27,11 @@ export class DashboardService {
     return this.http.get<ApiResponse<CompteCourantResponse[]>>(`${environment.apiUrl}/comptes-courants/poissonnerie/${poissonnerieId}/en-dette`);
   }
 
- 
+
+  getFacturesDuJour(poissonnerieId: number, date: string) {
+    return this.http.get<ApiResponse<FactureResponse[]>>(`${environment.apiUrl}/factures?poissonnerieId=${poissonnerieId}&date=${date}`);
+  }
+
+
 
 }

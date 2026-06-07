@@ -1,0 +1,83 @@
+import { ChangeDetectionStrategy, Component, inject, effect, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop'; // <-- IMPORT THIS
+import { LucideAngularModule } from 'lucide-angular';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { ClientStore } from '../../stores/client.store';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
+import { TransactionFormComponent } from '../../components/transaction-form/transaction-form.component';
+import { AuthStore } from '../../../../core/stores/auth.store';
+
+@Component({
+  selector: 'app-client-detail',
+  standalone: true,
+  imports: [LucideAngularModule, RouterLink, DatePipe,
+            ModalComponent, TransactionFormComponent,
+            DecimalPipe],
+  templateUrl: './client-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class ClientDetailComponent {
+
+  readonly clientStore = inject(ClientStore);
+  private readonly route = inject(ActivatedRoute);
+  public readonly authStore = inject(AuthStore);
+
+  // DIRECTIVE: Convert route params to a Signal
+  private readonly paramMap = toSignal(this.route.paramMap);
+
+  // Modal state
+  isModalOpen = signal<boolean>(false);
+  modalTitle = signal<string>('');
+  modalError = signal<string | null>(null);
+
+  // Controls which tab is visible: 'courant' or 'epargne'
+  activeTab = signal<'courant' | 'epargne'>('courant');
+
+  currentAction = signal<'emprunt' | 'remboursement' | 'depot' | 'retrait' | 'limite' | null>(null);
+
+  constructor() {
+    // DIRECTIVE: Use effect to reactively load the client when the ID changes
+    effect(() => {
+      const idParam = this.paramMap()?.get('id');
+      if (idParam) {
+        this.clientStore.loadClientDetail(Number(idParam));
+      }
+    });
+  }
+
+  setTab(tab: 'courant' | 'epargne') {
+    this.activeTab.set(tab);
+  }
+
+  openTransactionModal(action: 'emprunt' | 'remboursement' | 'depot' | 'retrait' | 'limite', title: string) {
+    this.currentAction.set(action);
+    this.modalTitle.set(title);
+    this.modalError.set(null);
+    this.isModalOpen.set(true);
+  }
+
+  async onSaveTransaction(data: { amount: number, notes: string }) {
+    const clientId = this.clientStore.selectedClient()?.id;
+    if (!clientId) return;
+
+    const action = this.currentAction();
+
+    try {
+      if (action === 'limite') {
+        await this.clientStore.modifierLimite(data.amount);
+      } else {
+        await this.clientStore.executeTransaction(action!, data.amount, data.notes);
+      }
+
+      this.isModalOpen.set(false);
+      // The effect() won't trigger here because the ID didn't change in the URL,
+      // so we still need to call loadClientDetail manually to refresh the data.
+      await this.clientStore.loadClientDetail(clientId);
+    } catch (error: any) {
+      console.error('Transaction failed', error);
+      const msg = error.error?.message || 'Une erreur est survenue.';
+      this.modalError.set(msg);
+    }
+  }
+}

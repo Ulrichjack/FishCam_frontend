@@ -6,10 +6,15 @@ import { AlertRibbonComponent } from '../../components/alert-ribbon/alert-ribbon
 import { NotificationPreviewComponent } from '../../components/notification-preview/notification-preview.component';
 import { DailyReportCardComponent } from '../../components/daily-report-card/daily-report-card.component';
 import { NotificationStore } from '../../../notifications/stores/notification.store';
+import { CaissiereDashboardComponent } from '../../components/caissiere-dashboard/caissiere-dashboard.component';
+import { GreetingHeaderComponent } from '../../../../shared/components/greeting-header/greeting-header.component';
+import { EnregistreurDashboardComponent } from '../../components/enregistreur-dashboard/enregistreur-dashboard.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [StatsRowComponent,AlertRibbonComponent,NotificationPreviewComponent,DailyReportCardComponent],
+  imports: [StatsRowComponent,AlertRibbonComponent,NotificationPreviewComponent,
+            DailyReportCardComponent,CaissiereDashboardComponent, 
+            GreetingHeaderComponent,EnregistreurDashboardComponent],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,19 +22,27 @@ import { NotificationStore } from '../../../notifications/stores/notification.st
 export class DashboardPageComponent implements OnInit {
 
   readonly store = inject(DashboardStore);
-  private readonly auth = inject(AuthStore);
+  public readonly authStore = inject(AuthStore);
   readonly notificationStore = inject(NotificationStore);
 
 
   ngOnInit() {
-     const poissonnerieId = this.auth.user()?.poissonnerieId;
-    console.log('dashboard init', { poissonnerieId});
+     const poissonnerieId = this.authStore.user()?.poissonnerieId;
+     const role = this.authStore.user()?.role;
 
     // Pass BOTH IDs to the store
-    if (poissonnerieId) {
-      this.store.loadStats(poissonnerieId);
-    }
-  }
+    if (poissonnerieId && role) { 
+      if(role === 'PATRON' || role === 'SUPER_ADMIN'){
 
+         this.store.loadStats(poissonnerieId);
+
+      } else{
+
+        this.store.loadRoleSpecificData(poissonnerieId, role);
+      }
+      
+    }
+  
+  }
 
 }

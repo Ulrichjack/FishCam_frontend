@@ -22,6 +22,7 @@ export interface ClientResponse{
   poissonnerie:PoissonnerieResponse;
   active: boolean;
   createdAt: string;
+  soldeCompteCourant?: number;
 }
 
 export enum StatutCompteCourant{

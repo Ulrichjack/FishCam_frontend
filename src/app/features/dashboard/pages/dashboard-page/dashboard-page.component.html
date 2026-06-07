@@ -1,30 +1,32 @@
 <div class="flex flex-col gap-6">
 
-  <!-- 1. The Stats Row (Top) -->
-  <app-stats-row></app-stats-row>
+  @if (authStore.isPatron() || authStore.isSuperAdmin()) {
+    <!-- DASHBOARD PATRON / SUPER_ADMIN -->
+         <app-greeting-header [userName]="authStore.user()?.firstName || 'Utilisateur'"></app-greeting-header>
+    <app-stats-row></app-stats-row>
+    <app-alert-ribbon></app-alert-ribbon>
 
-  <!-- 2. The Alert Ribbon (Middle) -->
-  <app-alert-ribbon></app-alert-ribbon>
-
-  <!-- 3. The Bottom Section (Split 60/40) -->
-  <!-- We only show this section if the stats are loaded to prevent crashes -->
-  @if (store.stats()) {
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-
-      <!-- Left Side: Daily Report (Takes 3 columns on large screens) -->
-      <div class="lg:col-span-3">
-        <!-- We pass the message from the store to the Dumb component -->
-        <app-daily-report-card
-          [reportMessage]="notificationStore.dailyReport()?.message || 'Aucun rapport disponible pour aujourd\'hui.'">
-        </app-daily-report-card>
+    @if (store.stats()) {
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3">
+          <app-daily-report-card
+            [reportMessage]="notificationStore.dailyReport()?.message || 'Aucun rapport disponible pour aujourd\'hui.'">
+          </app-daily-report-card>
+        </div>
+        <div class="lg:col-span-2">
+          <app-notification-preview></app-notification-preview>
+        </div>
       </div>
-
-      <!-- Right Side: Notifications (Takes 2 columns on large screens) -->
-      <div class="lg:col-span-2">
-        <app-notification-preview></app-notification-preview>
-      </div>
-
-    </div>
+    }
+  } 
+  @else if (authStore.isCaissiere()) {
+    <!-- DASHBOARD CAISSIÈRE (Placeholder) -->
+        <app-caissiere-dashboard></app-caissiere-dashboard>
+  
+  } 
+  @else if (authStore.isEnregistreur()) {
+    <!-- DASHBOARD ENREGISTREUR (Placeholder) -->
+    <app-enregistreur-dashboard></app-enregistreur-dashboard>
+  
   }
-
 </div>

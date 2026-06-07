@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, output, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthStore } from '../../core/stores/auth.store';
@@ -14,12 +14,24 @@ import { AuthStore } from '../../core/stores/auth.store';
 export class SidebarComponent {
 
     public readonly authStore = inject(AuthStore);
-    readonly closeRequested = output<void>();
     private router = inject(Router);
+
+    isAdministrationMenuOpen = signal(false);
+    isGestionMenuOpen = signal(false);
+
+    readonly closeRequested = output<void>();
 
     logout(){
       this.authStore.logout();
       this.router.navigate(['/login']);
     }
+
+    toggleAdministrationMenu() {
+    this.isAdministrationMenuOpen.set(!this.isAdministrationMenuOpen());
+  }
+
+  toggleGestionMenu() {
+    this.isGestionMenuOpen.set(!this.isGestionMenuOpen());
+  }
 
 }

@@ -14,16 +14,19 @@ a[routerLink].sidebar-link-active-danger {
 @theme{
     --color-fc-green: #185216;
     --color-fc-green-light: #E8F5E9;
-    --color-fc-green-dark: #135513;
+    --color-fc-green-dark: #0a330a;
 
     /*Accent*/
     --color-fc-yellow: #F59E0B;
     --color-fc-yellow-light:#FEF3C7;
     --color-fc-yellow-dark: #D97706;
+    --color-fc-orange: #F97316;
+
 
     /*Danger*/
     --color-fc-red: #DC2626;
     --color-fc-red-light:#FEF2F2;
+     --color-fc-red-dark: #B91C1C;
 
     /*Neutral*/
     --color-fc-text:#111827;
@@ -31,6 +34,8 @@ a[routerLink].sidebar-link-active-danger {
     --color-fc-bg: #F9FAFB;
     --color-fc-white:#FFFFFF;
     --color-fc-border: #E5E7EB;
+
+
 
 
 }

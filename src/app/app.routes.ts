@@ -12,10 +12,13 @@ export const routes: Routes = [
     path: '',
     component: AppShellComponent,
      canActivate:[authGuard],
-    children: [
-      {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
-      {path: 'dashboard', component: DashboardPageComponent}
-    ]
+     children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardPageComponent },
+      { path: 'clients',loadComponent: () => import('./features/clients/pages/clients-list/clients-list.component').then(m => m.ClientsListComponent) },
+      { path: 'clients/:id',loadComponent: () => import('./features/clients/pages/client-detail/client-detail.component').then(m => m.ClientDetailComponent) },
+
+     ]
    },
 
    //Fallback route - redirige vers login si aucune route ne correspond

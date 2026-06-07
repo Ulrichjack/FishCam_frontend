@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { CompteCourantResponse } from '../../../core/models/compte-courant.model';
@@ -8,6 +8,7 @@ import { CompteCourantResponse } from '../../../core/models/compte-courant.model
   standalone: true,
   imports: [NgClass, LucideAngularModule, DecimalPipe],
   templateUrl: './debtor-pill.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DebtorPillComponent {
 

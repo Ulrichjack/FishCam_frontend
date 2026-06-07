@@ -1,57 +1,21 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { jwtInterceptor } from './core/auth/jwt.interceptor';
 import { errorInterceptor } from './core/auth/error.interceptor';
-import { importProvidersFrom } from '@angular/core';
-import {
-  LucideAngularModule,
-  LayoutDashboard,
-  Users,
-  AlertTriangle,
-  ArrowLeftRight,
-  Bell,
-  Building2,
-  UserCog,
-  LogOut,
-  Settings,
-  Headphones,
-  CircleDollarSign,
-  Menu,           // <-- ADDED
-  TrendingDown,   // <-- ADDED
-  PiggyBank,      // <-- ADDED
-  Wallet,         // <-- ADDED
-  Search          // <-- ADDED
-} from 'lucide-angular';
+import { lucideIconsProvider } from './core/icons/lucide-icons';
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+registerLocaleData(localeFr, 'fr');
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor])),
-    importProvidersFrom(
-      LucideAngularModule.pick({
-        LayoutDashboard,
-        Users,
-        AlertTriangle,
-        ArrowLeftRight,
-        Bell,
-        Building2,
-        UserCog,
-        LogOut,
-        Settings,
-        Headphones,
-        CircleDollarSign,
-        Menu,           // <-- ADDED
-        TrendingDown,   // <-- ADDED
-        PiggyBank,      // <-- ADDED
-        Wallet,         // <-- ADDED
-        Search          // <-- ADDED
-      })
-    )
-
-    ]
+    lucideIconsProvider,
+    { provide: LOCALE_ID, useValue: 'fr' }
+  ]
 };

@@ -12,7 +12,7 @@
               px-8 py-10 md:w-5/12 md:px-12 lg:px-16">
 
     <!-- ── Formulaire centré ── -->
-    <div class="mx-auto w-full max-w-[400px] py-10">
+    <div class="mx-auto w-full max-w-100 py-10">
 
     <!-- ── Logo top-left ── -->
      <div class="flex justify-center mb-6">
@@ -82,8 +82,10 @@
             <label for="password" class="fc-label" style="margin:0">Mot de passe</label>
             <a routerLink="/forgot-password"
                class="text-xs font-medium hover:underline transition-colors"
-               fc-text-brand>
-              Oublié ?
+               >
+               <span class="text-fc-green">
+                Oublié ?
+               </span>
             </a>
           </div>
           <div class="fc-input-wrap"

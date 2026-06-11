@@ -31,7 +31,7 @@ export class ClientsListComponent implements OnInit {
 
 
   ngOnInit(): void {
-    const poissonnerieId = this.authStore.user()?.poissonnerieId;
+    const poissonnerieId = this.authStore.activePoissonnerieId();
     if (poissonnerieId) {
       this.clientStore.loadClients(poissonnerieId, 0);
     }
@@ -40,7 +40,7 @@ export class ClientsListComponent implements OnInit {
   onSearch(event: Event){
     const inputElement = event.target as HTMLInputElement;
     const searchTerm = inputElement.value;
-    const poissonnerieId = this.authStore.user()?.poissonnerieId;
+    const poissonnerieId = this.authStore.activePoissonnerieId();
 
     if(!poissonnerieId) return;
 
@@ -59,7 +59,7 @@ export class ClientsListComponent implements OnInit {
   }
 
   async onSaveClient(clientData: any){
-    const poissonnerieId = this.authStore.user()?.poissonnerieId;
+    const poissonnerieId = this.authStore.activePoissonnerieId();
     if (!poissonnerieId) return;
 
     const currentClient = this.clientToEdit();
@@ -113,7 +113,7 @@ export class ClientsListComponent implements OnInit {
   onFilterChange(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     const showInactive = selectElement.value === 'inactive';
-    const poissonnerieId = this.authStore.user()?.poissonnerieId;
+    const poissonnerieId = this.authStore.activePoissonnerieId();
 
     if (poissonnerieId) {
       this.clientStore.toggleFilter(poissonnerieId, showInactive);

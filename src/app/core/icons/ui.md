@@ -971,3 +971,251 @@ ERROR STATE
                           └──────────────────────────────────────┘
   🟢 = unread dot   click notification → mark as read → close dropdown
 ```
+
+
+
+## IMAGE 1 — FICHE D'ÉPARGNE (Physical document decoded)
+GIC FNJLCP · FISH-CAM · Poissonnerie La Référence
+FICHE D'ÉPARGNE N°003/25
+Client: MAYWEGHUA LTETMBOUG SAMARING · Tél: 674 52 18 14
+Table: Date | Retrait | Versement | Solde | Solde en lettres | Signature
+
+INTERFACE 1 — PAGE DÉTAIL ÉPARGNE (/clients/:id → Tab Épargne)
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ ← Retour    Marie Kamga                              [ACTIVE 🟢]    │
+│             📞 674 52 18 14 · Quartier Akwa                         │
+├─────────────────────────────────────────────────────────────────────┤
+│  [Compte Courant]        **[Épargne]**        ← active tab          │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  **COMPTE ÉPARGNE**                   N° Fiche : 003/25            │
+│  ─────────────────────────────────────────────────────────          │
+│                                                                     │
+│  ┌──────────────┬───────────────┬───────────────────────────────┐  │
+│  │              │               │   **Solde actuel**            │  │
+│  │              │               │   47 000 FCFA 🟢              │  │
+│  │              │               │                               │  │
+│  │  [💰 Dépôt] │ [💸 Retrait]  │   [📄 Télécharger Fiche PDF] │  │
+│  └──────────────┴───────────────┴───────────────────────────────┘  │
+│                                                                     │
+│  **Historique des Mouvements**                                      │
+│  ─────────────────────────────────────────────────────────          │
+│                                                                     │
+│ ┌──────────────┬────────────────┬────────────────┬────────────────┐ │
+│ │ **Date**     │ **Retrait**    │ **Versement**  │ **Solde**      │ │
+│ ├──────────────┼────────────────┼────────────────┼────────────────┤ │
+│ │ 19/06/2025   │ —              │ +13 000 FCFA🟢 │ 13 000 FCFA    │ │
+│ │ 25/06/2025   │ —              │ +10 000 FCFA🟢 │ 23 000 FCFA    │ │
+│ │ 02/07/2025   │ -5 000 FCFA 🔴 │ —              │ 18 000 FCFA    │ │
+│ │ 15/07/2025   │ —              │ +20 000 FCFA🟢 │ 38 000 FCFA    │ │
+│ │ 01/08/2025   │ —              │  +9 000 FCFA🟢 │ 47 000 FCFA    │ │
+│ └──────────────┴────────────────┴────────────────┴────────────────┘ │
+│  Page 1 sur 3                              [< Précédent  Suivant >] │
+│                                                                     │
+│  ─────────────────────────────────────────────────────────          │
+│  **Solde Total : 47 000 FCFA**   Nombre de mouvements : 14          │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+Color rules for movements :
+Versement (Dépôt)  → +montant  bg-fc-green-light  text-fc-green   🟢
+Retrait            → -montant  bg-fc-red-light    text-fc-red     🔴
+Solde positif      → text-fc-green  font-bold
+Solde zéro         → text-gray-500
+
+## MODAL — Faire un Dépôt (Versement)
+```
+         ┌────────────────────────────────────────────┐
+         │  💰 Faire un Versement / Dépôt        [×]  │
+         ├────────────────────────────────────────────┤
+         │                                            │
+         │  ┌──────────────────────────────────────┐  │
+         │  │  Client : Marie Kamga                │  │
+         │  │  N° Fiche : 003/25                   │  │
+         │  │  Solde actuel : 47 000 FCFA 🟢       │  │
+         │  └──────────────────────────────────────┘  │
+         │                                            │
+         │  Montant du versement (FCFA) *             │
+         │  ┌──────────────────────────────────────┐  │
+         │  │ 10 000                               │  │
+         │  └──────────────────────────────────────┘  │
+         │  ← Pas de maximum (versement libre)        │
+         │                                            │
+         │  Nouveau solde après dépôt :               │
+         │  **57 000 FCFA** ← calculated in real-time │
+         │                                            │
+         ├────────────────────────────────────────────┤
+         │      [Annuler]    [✅ Confirmer le dépôt]  │
+         │                    button: bg-fc-green     │
+         └────────────────────────────────────────────┘
+```
+
+## MODAL — Faire un Retrait
+```
+         ┌────────────────────────────────────────────┐
+         │  💸 Faire un Retrait                  [×]  │
+         ├────────────────────────────────────────────┤
+         │                                            │
+         │  ┌──────────────────────────────────────┐  │
+         │  │  Client : Marie Kamga                │  │
+         │  │  N° Fiche : 003/25                   │  │
+         │  │  Solde actuel : 47 000 FCFA 🟢       │  │
+         │  └──────────────────────────────────────┘  │
+         │                                            │
+         │  Montant du retrait (FCFA) *               │
+         │  ┌──────────────────────────────────────┐  │
+         │  │ 5 000                                │  │
+         │  └──────────────────────────────────────┘  │
+         │  Maximum : **47 000 FCFA** (solde actuel)  │
+         │                                            │
+         │  Nouveau solde après retrait :             │
+         │  **42 000 FCFA** ← calculated in real-time │
+         │                                            │
+         │  ⚠️ Retrait impossible si solde < montant  │
+         │                                            │
+         ├────────────────────────────────────────────┤
+         │      [Annuler]   [💸 Confirmer le retrait] │
+         │                   button: bg-fc-orange     │
+         └────────────────────────────────────────────┘
+```
+
+## IMAGE 2 — INVENTAIRE MENSUEL DÉCEMBRE 2025 (Physical document decoded)
+FISH-CAM · POISSONNERIE LA REFERENCE · AGENCE NKONGSAMBA II LELE
+INVENTAIRE MOIS DE DECEMBRE 2025
+Columns: DATE | MONTANT ACHAT | VENTE PREVISIBLE | VENTE REALISEE
+28 rows (daily entries) + TOTAL(FCFA) at bottom
+
+## INTERFACE 2 — PAGE RÉCAPITULATIF (/recapitulatifs)
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ **Récapitulatif Mensuel**                                           │
+├─────────────────────────────────────────────────────────────────────┤
+│  Poissonnerie : [La Référence - Nkongsamba      ▼]                 │
+│  Mois         : [Décembre                       ▼]                 │
+│  Année        : [2025                           ▼]                 │
+│                                                                     │
+│                    [📊 Générer le Récapitulatif]                    │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  **INVENTAIRE MOIS DE DÉCEMBRE 2025**                              │
+│  Poissonnerie La Référence · Agence Nkongsamba II Lélé             │
+│                                                                     │
+│  ─── KPI SUMMARY ─────────────────────────────────────────         │
+│                                                                     │
+│  ┌──────────────┬──────────────┬──────────────┬───────────────┐   │
+│  │ Total Achats │ Vente Prév.  │ Vente Réal.  │ Bénéfice Réel │   │
+│  │ 4 285 250    │ 5 042 600    │ 4 718 000    │ +432 750 🟢   │   │
+│  │ FCFA         │ FCFA         │ FCFA         │ FCFA          │   │
+│  └──────────────┴──────────────┴──────────────┴───────────────┘   │
+│                                                                     │
+│  ─── TABLEAU JOURNALIER ───────────────────────────────────────    │
+│                                                                     │
+│ ┌──────┬───────────────┬────────────────┬────────────────┬───────┐ │
+│ │**Jn**│**Mont. Achat**│**Vente Prév.** │**Vente Réal.** │**Marge│ │
+│ ├──────┼───────────────┼────────────────┼────────────────┼───────┤ │
+│ │  1   │  178 000      │  193 900       │  183 500       │ +5 500│ │
+│ │  2   │  232 500      │  456 300       │  167 500       │-65 000│ │
+│ │  3   │  230 250      │  253 250       │  162 500       │-67 750│ │
+│ │  4   │  127 000      │  139 400       │  192 300       │+65 300│ │
+│ │  5   │  143 750      │  156 900       │  165 500       │+21 750│ │
+│ │  6   │  175 500      │  190 500       │  236 500       │+61 000│ │
+│ │  7   │  210 000      │  259 500       │  169 500       │-40 500│ │
+│ │  8   │  125 000      │  135 000       │  183 500       │+58 500│ │
+│ │  9   │  147 500      │  156 500       │  173 500       │+26 000│ │
+│ │  10  │  247 750      │  266 000       │  202 500       │-45 250│ │
+│ │  11  │  151 000      │  161 500       │  162 500       │+11 500│ │
+│ │  12  │  237 000      │  257 000       │  162 500       │-74 500│ │
+│ │  13  │   95 500      │  101 500       │  151 500       │+56 000│ │
+│ │  14  │  105 500      │  110 500       │  145 500       │+40 000│ │
+│ │  15  │  180 750      │  198 000       │  189 500       │ +8 750│ │
+│ │  16  │  135 500      │  149 500       │  153 500       │+18 000│ │
+│ │  17  │  173 500      │  186 000       │  147 500       │-26 000│ │
+│ │  18  │  146 500      │  161 000       │  147 500       │ +1 000│ │
+│ │  19  │  192 000      │  208 500       │  187 500       │ -4 500│ │
+│ │  20  │  160 000      │  172 500       │  171 500       │+11 500│ │
+│ │  21  │  155 750      │  148 800       │  135 800       │-19 950│ │
+│ │  22  │  102 000      │  108 000       │  160 500       │+58 500│ │
+│ │  23  │  184 000      │  196 000       │  158 500       │-25 500│ │
+│ │  24  │  397 500      │  427 000       │  429 500       │+32 000│ │
+│ │  25  │  142 500      │  151 000       │  170 500       │+28 000│ │
+│ │  26  │  104 500      │  115 000       │  105 000       │   500 │ │
+│ │  27  │  126 800      │  138 500       │  141 500       │+14 700│ │
+│ ├──────┼───────────────┼────────────────┼────────────────┼───────┤ │
+│ │**TOT**│**4 285 250** │**5 042 600**   │**4 718 000**   │**+432 │ │
+│ │      │  FCFA        │  FCFA          │  FCFA          │ 750** │ │
+│ └──────┴───────────────┴────────────────┴────────────────┴───────┘ │
+│                                                                     │
+│  ─── ANALYSE ─────────────────────────────────────────────────     │
+│                                                                     │
+│  Jours bénéficiaires : **18 / 27**   (🟢 Vente Réal. > Achat)     │
+│  Meilleur jour       : **Jour 24**   → +32 000 FCFA bénéfice      │
+│  Pire jour           : **Jour 12**   → -74 500 FCFA de perte      │
+│  Taux réalisation    : **93.6%**     (Réal. / Prévisible)          │
+│                                                                     │
+├─────────────────────────────────────────────────────────────────────┤
+│                   [📄 Télécharger PDF]    [📊 Exporter Excel]       │
+│               → GET /exports/recapitulatif/pdf                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+```
+Marge column color rules :
+Marge positive  → text-fc-green   ← Vente réalisée > Achat
+Marge négative  → text-fc-red     ← Vente réalisée < Achat
+Marge = 0       → text-gray-500
+
+## PDF EXPORT — Fiche d'Épargne (matches physical document)
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        **GIC FNJLCP**                              │
+│         FORCE NATIONALE DES JEUNES POUR LA LUTTE CONTRE            │
+│                        LA PAUVRETE                                  │
+│              Siège : FISH-CAM (Poissonnerie la Référence)          │
+│              Tél : 676.02.88.00 / 699.02.58.64                     │
+│                                                                     │
+│              **FICHE D'ÉPARGNE N°____ / 25**                       │
+├──────────────────────────────────────────────────────────────────── │
+│  Nom  : ________________________________                            │
+│  Prénom : ________________________________                          │
+│  CNI N° : ________________________________  Tél : _______________  │
+├──────┬─────────────┬─────────────┬──────────┬───────────┬─────────┤
+│      │  **Retrait**│**Versement**│ **Solde**│ Solde en  │Sign.    │
+│**Dt**│  withdrawal │   Deposit   │ Balance  │ lettres   │ visa    │
+├──────┼─────────────┼─────────────┼──────────┼───────────┼─────────┤
+│      │             │             │          │           │         │
+│      │             │             │          │           │         │
+│      │             │             │          │           │         │
+│      │             │             │          │           │         │
+└──────┴─────────────┴─────────────┴──────────┴───────────┴─────────┘
+```
+
+## API CALLS MAPPING
+ ```
+Dépôt (Versement) :
+  POST /epargnes/depot
+  Body: { epargneId: number, amount: number }
+  → Response: EpargneResponse { id, currentBalance }
+
+Retrait :
+  POST /epargnes/retrait
+  Body: { epargneId: number, amount: number }
+  → Validation: amount ≤ currentBalance
+
+Historique épargne :
+  GET  /epargnes/{id}
+  → Response: EpargneDetailResponse { epargne, transactions[] }
+
+Récapitulatif :
+  GET  /recapitulatifs?poissonnerieId=X&start=YYYY-MM-01&end=YYYY-MM-31
+  → Response: RecapitulatifResponse
+
+Export PDF fiche épargne :
+  GET  /exports/epargnes/{id}/pdf
+  → byte[] → Blob → download
+
+Export PDF récapitulatif :
+  GET  /exports/recapitulatif/{id}/pdf?poissonnerieId=X&start=Y&end=Z
+  → byte[] → Blob → download
+
+  ```

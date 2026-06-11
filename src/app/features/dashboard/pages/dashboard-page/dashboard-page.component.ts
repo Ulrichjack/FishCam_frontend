@@ -27,7 +27,7 @@ export class DashboardPageComponent implements OnInit {
 
 
   ngOnInit() {
-     const poissonnerieId = this.authStore.user()?.poissonnerieId;
+     const poissonnerieId = this.authStore.activePoissonnerieId();
      const role = this.authStore.user()?.role;
 
     // Pass BOTH IDs to the store

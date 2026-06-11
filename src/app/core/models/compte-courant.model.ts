@@ -1,4 +1,5 @@
 import { PoissonnerieResponse } from "./PoissonnerieResponse.model";
+import { UserResponse } from "./user.model";
 
 export interface CompteCourantResponse {
   id: number;
@@ -25,8 +26,25 @@ export interface ClientResponse{
   soldeCompteCourant?: number;
 }
 
+export interface TransactionCCResponse {
+  id: number;
+  type: TypeTransaction;
+  montant: number;
+  soldePrecedent: number;
+  soldeApres: number;
+  description: string;
+  effectuePar: UserResponse;
+  transactionDate: string;
+  notes:string;
+}
+
 export enum StatutCompteCourant{
   ACTIF = 'ACTIF',
   EN_DETTE = 'EN_DETTE',
   BLOQUE = 'BLOQUE'
+}
+
+export enum TypeTransaction{
+  EMPRUNT = 'EMPRUNT',
+  REMBOURSEMENT = 'REMBOURSEMENT'
 }

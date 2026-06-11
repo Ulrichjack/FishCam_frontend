@@ -43,7 +43,9 @@ import {
   ScrollText,
   Shield,
   ChevronDown,
-  CreditCard
+  CreditCard,
+  Save,
+  Lock
 
  
 
@@ -93,7 +95,9 @@ const icons = {
   ScrollText,
   Shield,
   ChevronDown,
-  CreditCard
+  CreditCard,
+  Save,
+  Lock
 
 };
 

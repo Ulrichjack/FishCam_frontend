@@ -19,8 +19,9 @@ export const routes: Routes = [
       { path: 'clients/:id',loadComponent: () => import('./features/clients/pages/client-detail/client-detail.component').then(m => m.ClientDetailComponent) },
       { path: 'factures', loadComponent: () => import('./features/factures/pages/factures-list/factures-list.component').then(m => m.FacturesListComponent) },
       { path: 'factures/new', loadComponent: () => import('./features/factures/pages/facture-create/facture-create.component').then(m => m.FactureCreateComponent) },
-      { path: 'factures/:id', loadComponent: () => import('./features/factures/pages/facture-detail/facture-detail.component').then(m => m.FactureDetailComponent) }
-     ]
+      { path: 'factures/:id', loadComponent: () => import('./features/factures/pages/facture-detail/facture-detail.component').then(m => m.FactureDetailComponent) },
+      { path: 'transactions', loadComponent: () => import('./features/transactions/pages/transactions-list/transactions-list.component').then(m => m.TransactionsListComponent) }
+    ]
    },
 
    //Fallback route - redirige vers login si aucune route ne correspond

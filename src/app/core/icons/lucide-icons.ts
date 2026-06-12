@@ -45,7 +45,8 @@ import {
   ChevronDown,
   CreditCard,
   Save,
-  Lock
+  Lock,
+  ArrowRight,
 
  
 
@@ -97,7 +98,8 @@ const icons = {
   ChevronDown,
   CreditCard,
   Save,
-  Lock
+  Lock,
+  ArrowRight,
 
 };
 

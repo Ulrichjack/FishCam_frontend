@@ -80,4 +80,12 @@ export class TopbarComponent implements OnInit {
   onDocClick() {
     this.closeNotifDropdown();
   }
+
+  onShopChange(id: number) {
+    const selectedShop = this.poissonneries().find(p => p.id === id);
+    if (selectedShop) {
+      this.authStore.setActivePoissonnerie(id, selectedShop.name);
+    }
+  }
+
 }

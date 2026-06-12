@@ -4,14 +4,15 @@ import { firstValueFrom } from 'rxjs';
 import { NgClass } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { ProduitResponse } from '../../../core/models/produit.model';
-import { CreateLigneRequest } from '../../../core/models/facture-request.model';
+import { CreateLigneRequest, DernierPrixResponse } from '../../../core/models/facture-request.model';
 import { ProductAutocompleteComponent } from '../product-autocomplete/product-autocomplete.component';
 import { AchatJournalierService } from '../../../features/factures/services/achat-journalier.service';
+import { CurrencyFcfaPipe } from '../../pipes/currency-fcfa.pipe';
 
 @Component({
   selector: 'app-ligne-form',
   standalone: true,
-  imports: [ReactiveFormsModule, ProductAutocompleteComponent,  LucideAngularModule],
+  imports: [ReactiveFormsModule, ProductAutocompleteComponent,  LucideAngularModule, CurrencyFcfaPipe],
   templateUrl: './ligne-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -22,17 +23,11 @@ export class LigneFormComponent {
 
   poissonnerieId = input.required<number>();
 
-  // DIRECTIVE: Output that emits the form data + the product name (useful for the preview table)
   ligneAdded = output<CreateLigneRequest & { produitNom: string }>();
-
-  // DIRECTIVE: Signal to store the selected product name
   selectedProduitNom = signal<string>('');
-  
-  // DIRECTIVE: Signal to store the calculated total (quantite * prixUnitaire) for UI display only
   montantCalcule = signal<number>(0);
-  
-  // DIRECTIVE: Signal for loading state when fetching the last price
   isLoadingPrix = signal<boolean>(false);
+  dernierPrix = signal<DernierPrixResponse | null>(null);
 
   ligneForm: FormGroup = this.fb.group({
     produitId: [null, Validators.required],
@@ -63,12 +58,13 @@ export class LigneFormComponent {
     try {
       const response = await firstValueFrom(this.achatService.getDernierPrix(produit.id, this.poissonnerieId()));
       const dernierPrix = response.data; // <-- Ne pas oublier le .data !
-      
+      this.dernierPrix.set(dernierPrix);
       this.ligneForm.patchValue({ 
         prixUnitaireCarton: dernierPrix.montantCarton, // On utilise montantCarton à cause du DTO backend
         prixVenteKilo: dernierPrix.prixVenteKilo,
         poidsKg: dernierPrix.poidsParCarton // On auto-remplit aussi le poids !
       });
+      
     } catch (error) {
       console.error("Impossible de récupérer le dernier prix", error);
     } finally {

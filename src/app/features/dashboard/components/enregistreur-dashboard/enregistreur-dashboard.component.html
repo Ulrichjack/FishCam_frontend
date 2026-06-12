@@ -44,7 +44,7 @@
                 <tr class="hover:bg-gray-50 transition-colors">
                   <td class="px-6 py-4 whitespace-nowrap">{{ facture.dateAchat | date:'dd/MM/yyyy' }}</td>
                   <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ facture.fournisseurNom }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">{{ facture.totalAchat | number }} FCFA</td>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ facture.totalAchat | currencyFcfa }} </td>
                 </tr>
               } @empty {
                 <tr>

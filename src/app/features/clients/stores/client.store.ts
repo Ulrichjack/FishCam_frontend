@@ -1,4 +1,4 @@
-import { TransactionMode } from './../components/transaction-form/transaction-form.component';
+import { TransactionMode } from '../../../shared/components/transaction-form/transaction-form.component';
 import { Injectable, inject, signal } from '@angular/core';
 import { PageResponse } from '../../../core/models/api-response.model';
 import { ClientResponse } from '../../../core/models/compte-courant.model';

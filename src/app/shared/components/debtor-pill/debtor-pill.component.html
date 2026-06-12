@@ -8,6 +8,6 @@
   <!-- Debtor Info -->
   <span class="font-semibold text-red-600">{{ debtor().client.firstName }} {{ debtor().client.lastName }}</span>
   <span class="opacity-50">·</span>
-  <span class="font-bold ">{{ debtor().solde | number }} FCFA</span>
+  <span class="font-bold ">{{ debtor().solde | currencyFcfa }} FCFA</span>
 
 </div>

@@ -19,7 +19,7 @@
         <select 
           class="bg-transparent text-sm font-medium text-gray-700 outline-none cursor-pointer"
           [ngModel]="authStore.activePoissonnerieId()"
-          (ngModelChange)="authStore.setActivePoissonnerie($event)">
+          (ngModelChange)="onShopChange($event)">
           <!-- Boucle sur les vraies boutiques -->
           @for (p of poissonneries(); track p.id) {
             <option [ngValue]="p.id">{{ p.name }}</option>
@@ -92,7 +92,7 @@
           <div class="px-4 py-3 bg-gray-50">
             <a routerLink="/notifications"
                (click)="closeNotifDropdown()"
-               class="inline-flex w-full justify-center rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+               class="inline-flex w-full justify-center rounded-lg bg-fc-green px-3 py-2 text-sm font-semibold text-white hover:bg-fc-green-dark">
               Voir toutes les notifications
             </a>
           </div>
@@ -105,7 +105,7 @@
 
     <!-- 3. Profil Utilisateur -->
     <div class="flex items-center gap-2.5">
-      <div class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+      <div class="flex h-9 w-9 items-center justify-center rounded-full bg-fc-green text-sm font-bold text-white">
         {{ initials() }}
       </div>
       <div class="hidden sm:flex flex-col leading-tight">

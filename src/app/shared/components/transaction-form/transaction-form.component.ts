@@ -1,13 +1,14 @@
 import { DecimalPipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CurrencyFcfaPipe } from '../../pipes/currency-fcfa.pipe';
 
 export type TransactionMode = 'emprunt' | 'remboursement' | 'depot' | 'retrait' | 'limite';
 
 
 @Component({
   selector: 'app-transaction-form',
-  imports: [ReactiveFormsModule, NgClass, DecimalPipe],
+  imports: [ReactiveFormsModule, NgClass, CurrencyFcfaPipe],
   templateUrl: './transaction-form.component.html',
   styleUrl: './transaction-form.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

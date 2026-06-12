@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { DecimalPipe, NgClass } from '@angular/common';
+import {  NgClass } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { CompteCourantResponse } from '../../../core/models/compte-courant.model';
+import { CurrencyFcfaPipe } from '../../pipes/currency-fcfa.pipe';
 
 @Component({
   selector: 'app-debtor-pill',
   standalone: true,
-  imports: [NgClass, LucideAngularModule, DecimalPipe],
+  imports: [NgClass, LucideAngularModule, CurrencyFcfaPipe],
   templateUrl: './debtor-pill.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

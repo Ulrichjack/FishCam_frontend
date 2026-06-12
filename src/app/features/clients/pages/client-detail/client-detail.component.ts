@@ -5,15 +5,16 @@ import { LucideAngularModule } from 'lucide-angular';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ClientStore } from '../../stores/client.store';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
-import { TransactionFormComponent } from '../../components/transaction-form/transaction-form.component';
+import { TransactionFormComponent } from '../../../../shared/components/transaction-form/transaction-form.component';
 import { AuthStore } from '../../../../core/stores/auth.store';
+import { CurrencyFcfaPipe } from '../../../../shared/pipes/currency-fcfa.pipe';
 
 @Component({
   selector: 'app-client-detail',
   standalone: true,
   imports: [LucideAngularModule, RouterLink, DatePipe,
             ModalComponent, TransactionFormComponent,
-            DecimalPipe],
+            CurrencyFcfaPipe],
   templateUrl: './client-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

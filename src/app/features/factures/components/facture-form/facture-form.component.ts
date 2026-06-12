@@ -9,8 +9,9 @@ import { AuthStore } from '../../../../core/stores/auth.store';
 import { firstValueFrom } from 'rxjs';
 import { LigneFormComponent } from '../../../../shared/components/ligne-form/ligne-form.component';
 import { CreateLigneRequest } from '../../../../core/models/facture-request.model';
-import { DecimalPipe } from '@angular/common';
 import { FournisseurService } from '../../services/fournisseur.service';
+import { DecimalPipe } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 // Local interface for the state of lines before saving to DB
 export interface LigneFactureState extends CreateLigneRequest {
@@ -22,7 +23,8 @@ export interface LigneFactureState extends CreateLigneRequest {
 @Component({
   selector: 'app-facture-form',
   standalone: true,
-  imports: [ReactiveFormsModule, DecimalPipe,RouterLink, LucideAngularModule, FacturePreviewComponent, LigneFormComponent],
+  imports: [ReactiveFormsModule, RouterLink, LucideAngularModule, 
+    FacturePreviewComponent, LigneFormComponent, DecimalPipe],
   templateUrl: './facture-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -44,11 +46,16 @@ export class FactureFormComponent implements OnInit {
     livreurId: [null]
   });
 
+  formValues = toSignal(this.factureForm.valueChanges, { initialValue: this.factureForm.value });
   // State: List of lines added to the invoice
   lignes = signal<LigneFactureState[]>([]);
   totalAchat = computed(() => this.lignes().reduce((sum, ligne) => sum + ligne.montantCarton, 0));
   totalVente = computed(() => this.lignes().reduce((sum, ligne) => sum + ligne.montantVentePrev, 0));
   benefice = computed(() => this.totalVente() - this.totalAchat());
+  selectedFournisseurNom = computed(() => {
+    const id = this.formValues().fournisseurId;
+    return this.fournisseurs().find(f => f.id === id)?.nom ?? '...';
+  });
 
   // DIRECTIVE: Method called when LigneFormComponent emits a new line
   onLigneAdded(ligneData: CreateLigneRequest & { produitNom: string }) {

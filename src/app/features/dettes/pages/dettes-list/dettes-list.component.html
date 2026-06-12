@@ -1,0 +1,60 @@
+<div class="flex flex-col gap-6">
+
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Comptes en Dépassement</h1>
+      <p class="text-sm text-gray-500 mt-1">
+        Surveillez les clients dont le solde débiteur est élevé et enregistrez leurs remboursements.
+      </p>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  @if (store.isLoading()) {
+    <div class="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-gray-200">
+      <lucide-icon name="loader-circle" class="h-10 w-10 animate-spin text-fc-green mb-4"></lucide-icon>
+      <p class="text-gray-500 font-medium">Chargement des comptes en dette...</p>
+    </div>
+  } @else if (store.error()) {
+    <div class="bg-fc-red-light border border-fc-red text-fc-red p-6 rounded-xl flex flex-col items-center text-center">
+      <lucide-icon name="triangle-alert" class="h-10 w-10 mb-3"></lucide-icon>
+      <p class="font-bold text-lg mb-1">Erreur de chargement</p>
+      <p>{{ store.error() }}</p>
+    </div>
+  } @else if (store.debtors().length === 0) {
+    <div class="bg-white rounded-xl border border-gray-200 p-12 flex flex-col items-center text-center">
+      <div class="h-16 w-16 bg-fc-green-light text-fc-green rounded-full flex items-center justify-center mb-4">
+        <lucide-icon name="circle-check" class="h-8 w-8"></lucide-icon>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900 mb-1">Excellente nouvelle !</h3>
+      <p class="text-gray-500 max-w-md">Aucun client n'est actuellement en situation de dette dans cette poissonnerie.</p>
+    </div>
+  } @else {
+    <!-- Grille des cartes -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      @for (compte of store.debtors(); track compte.id) {
+        <app-debtor-card 
+          [compte]="compte" 
+          (reimburseClicked)="openReimburseModal($event)">
+        </app-debtor-card>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- Modale de Remboursement -->
+@if (isModalOpen() && selectedCompte()) {
+  <app-modal [isOpen]="isModalOpen()" title="Enregistrer un remboursement" (closed)="isModalOpen.set(false)">
+    <app-transaction-form
+      mode="remboursement"
+      [clientName]="selectedCompte()!.client.firstName + ' ' + selectedCompte()!.client.lastName"
+      [currentBalance]="selectedCompte()!.solde" 
+      [maxAmount]="selectedCompte()!.solde * -1"
+      (cancel)="isModalOpen.set(false)"
+      (save)="onSaveTransaction($event)">
+    </app-transaction-form>
+  </app-modal>
+
+}

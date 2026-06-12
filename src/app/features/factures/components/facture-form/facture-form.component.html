@@ -95,8 +95,9 @@
     <!-- RIGHT COLUMN (Preview) - 5/12 -->
     <div class="lg:col-span-7">
       <app-facture-preview 
+        [poissonnerieNom]="authStore.activePoissonnerieName() || 'Poissonnerie Inconnue'"
         [dateAchat]="factureForm.value.dateAchat"
-        [fournisseurNom]="factureForm.value.fournisseurId ? 'Fournisseur Sélectionné' : '...'"
+        [fournisseurNom]="selectedFournisseurNom()"
         [lignes]="lignes()"
         [totalAchat]="totalAchat()"
         [totalVente]="totalVente()"

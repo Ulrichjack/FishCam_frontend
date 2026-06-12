@@ -57,7 +57,7 @@
                 <td class="font-medium text-gray-900">#{{ facture.id }}</td>
                 <td class="font-medium text-gray-900">{{ facture.fournisseurNom }}</td>
                 <td class="text-gray-500">{{ facture.enregistreParNom }}</td>
-                <td class="font-bold text-gray-900">{{ facture.totalAchat | number }} FCFA</td>
+                <td class="font-bold text-gray-900">{{ facture.totalAchat | currencyFcfa }} </td>
                 <td>
                   @if (facture.cloture) {
                     <span class="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full border border-gray-300">Clôturée</span>

@@ -74,22 +74,22 @@
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Total Achats</p>
-        <p class="text-2xl font-bold text-gray-900">{{ fact.totalAchat | number }} FCFA</p>
+        <p class="text-2xl font-bold text-gray-900">{{ fact.totalAchat | currencyFcfa }} </p>
       </div>
 
       <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Vente Prévisible</p>
-        <p class="text-2xl font-bold text-gray-900">{{ fact.totalVente | number }} FCFA</p>
+        <p class="text-2xl font-bold text-gray-900">{{ fact.totalVente | currencyFcfa }} </p>
       </div>
 
       <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Bénéfice Prévu</p>
         @if (fact.margeTotal > 0) {
-          <p class="text-2xl font-bold text-fc-green">+{{ fact.margeTotal | number }} FCFA</p>
+          <p class="text-2xl font-bold text-fc-green">+{{ fact.margeTotal | currencyFcfa }}</p>
         } @else if (fact.margeTotal < 0) {
-          <p class="text-2xl font-bold text-fc-red">{{ fact.margeTotal | number }} FCFA</p>
+          <p class="text-2xl font-bold text-fc-red">{{ fact.margeTotal | currencyFcfa }}</p>
         } @else {
-          <p class="text-2xl font-bold text-gray-400">0 FCFA</p>
+          <p class="text-2xl font-bold text-gray-400">0 </p>
         }
       </div>
     </div>
@@ -104,11 +104,11 @@
             <tr>
               <th class="px-6 py-4 font-medium">Produit</th>
               <th class="px-6 py-4 font-medium text-center">Qté</th>
-              <th class="px-6 py-4 font-medium text-right">Prix/Crt</th>
+              <th class="px-6 py-4 font-medium text-right">Prix/Carton</th>
               <th class="px-6 py-4 font-medium text-right">Montant</th>
               <th class="px-6 py-4 font-medium text-right">Poids (kg)</th>
-              <th class="px-6 py-4 font-medium text-right">Vte/kg</th>
-              <th class="px-6 py-4 font-medium text-right">Vte Total</th>
+              <th class="px-6 py-4 font-medium text-right">kg/Vte</th>
+              <th class="px-6 py-4 font-medium text-right">Vente Total</th>
               @if (!fact.cloture) {
                 <th class="px-6 py-4 font-medium text-center w-16"></th>
               }
@@ -119,11 +119,11 @@
               <tr class="hover:bg-gray-50 transition-colors">
                 <td class="px-6 py-4 font-medium text-gray-900">{{ ligne.produitNom }}</td>
                 <td class="px-6 py-4 text-center text-gray-700">{{ ligne.quantiteCartons }}</td>
-                <td class="px-6 py-4 text-right text-gray-700">{{ ligne.prixUnitaireCarton | number }}</td>
-                <td class="px-6 py-4 text-right font-semibold text-gray-900">{{ ligne.montantCarton | number }}</td>
-                <td class="px-6 py-4 text-right text-gray-700">{{ ligne.poidsKg | number }}</td>
-                <td class="px-6 py-4 text-right text-gray-700">{{ ligne.prixVenteKilo | number }}</td>
-                <td class="px-6 py-4 text-right font-semibold text-fc-green">{{ ligne.prixVenteTotal | number }}</td>
+                <td class="px-6 py-4 text-right text-gray-700">{{ ligne.prixUnitaireCarton | currencyFcfa }}</td>
+                <td class="px-6 py-4 text-right font-semibold text-gray-900">{{ ligne.montantCarton | currencyFcfa }}</td>
+                <td class="px-6 py-4 text-right text-gray-700">{{ ligne.poidsKg | currencyFcfa }}</td>
+                <td class="px-6 py-4 text-right text-gray-700">{{ ligne.prixVenteKilo | currencyFcfa }}</td>
+                <td class="px-6 py-4 text-right font-semibold text-fc-green">{{ ligne.prixVenteTotal | currencyFcfa }}</td>
                 @if (!fact.cloture) {
                   <td class="px-6 py-4 text-center">
                     <button (click)="deleteLigne(ligne.id)"
@@ -183,11 +183,11 @@
           <div class="flex items-center gap-6">
             <span class="text-gray-600">
               Total achat :
-              <span class="font-bold text-gray-900 ml-1">{{ fact.totalAchat | number }} FCFA</span>
+              <span class="font-bold text-gray-900 ml-1">{{ fact.totalAchat | currencyFcfa }} </span>
             </span>
             <span class="text-gray-600">
               Vente prév. :
-              <span class="font-bold text-fc-green ml-1">{{ fact.totalVente | number }} FCFA</span>
+              <span class="font-bold text-fc-green ml-1">{{ fact.totalVente | currencyFcfa }}</span>
             </span>
           </div>
         </div>
@@ -205,4 +205,13 @@
   confirmText="Clôturer"
   (cancelled)="isConfirmOpen.set(false)"
   (confirmed)="executeClose()">
+</app-confirm-dialog>
+
+<app-confirm-dialog
+  [isOpen]="isDeleteConfirmOpen()"
+  title="Supprimer le produit"
+  message="Voulez-vous vraiment supprimer ce produit de la facture ?"
+  confirmText="Supprimer"
+  (cancelled)="isDeleteConfirmOpen.set(false)"
+  (confirmed)="executeDeleteLigne()">
 </app-confirm-dialog>

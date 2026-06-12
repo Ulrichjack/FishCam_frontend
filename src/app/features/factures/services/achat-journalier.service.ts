@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse } from '../../../core/models/api-response.model';
-import { CreateLigneRequest, DernierPrixResponse } from '../../../core/models/facture-request.model';
+import { CreateLigneRequest, DernierPrixResponse, LigneAchatResponse } from '../../../core/models/facture-request.model';
 import { CreateFactureRequest,  FactureDetailResponse,  FactureResponse } from '../../../core/models/facture';
 
 @Injectable({
@@ -28,7 +28,7 @@ export class AchatJournalierService {
   }
 
   addLigne(factureId: number, ligneRequest: CreateLigneRequest){
-    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/${factureId}/lignes`, ligneRequest);
+    return this.http.post<ApiResponse<LigneAchatResponse>>(`${this.apiUrl}/${factureId}/lignes`, ligneRequest);
   }
 
 

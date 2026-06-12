@@ -6,7 +6,7 @@ import { NotificationStore } from '../../../notifications/stores/notification.st
 import { AlertRibbonComponent } from '../../components/alert-ribbon/alert-ribbon.component';
 import { NotificationPreviewComponent } from '../../components/notification-preview/notification-preview.component';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
-import { TransactionFormComponent, TransactionMode } from '../../../clients/components/transaction-form/transaction-form.component';
+import { TransactionFormComponent, TransactionMode } from '../../../../shared/components/transaction-form/transaction-form.component';
 import { LucideAngularModule } from 'lucide-angular';
 // DIRECTIVE: Import the StatCardComponent
 import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card.component';

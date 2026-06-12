@@ -5,12 +5,12 @@ import { FactureStore } from '../../stores/facture.store';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { FormsModule } from '@angular/forms'; // Needed for ngModel on the date input
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
-import { DecimalPipe } from '@angular/common';
+import { CurrencyFcfaPipe } from '../../../../shared/pipes/currency-fcfa.pipe';
 
 @Component({
   selector: 'app-factures-list',
   standalone: true,
-  imports: [RouterLink, LucideAngularModule, DecimalPipe, FormsModule, ConfirmDialogComponent],
+  imports: [RouterLink, LucideAngularModule,  FormsModule, ConfirmDialogComponent, CurrencyFcfaPipe],
   templateUrl: './factures-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

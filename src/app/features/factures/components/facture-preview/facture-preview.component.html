@@ -3,8 +3,9 @@
   <!-- Header Reçu -->
   <div class="bg-gray-900 text-white p-6 text-center">
     <h2 class="text-xl font-bold tracking-wider"> FISH-CAM</h2>
-    <p class="text-sm text-gray-300 mt-1">Poissonnerie La Référence</p>
-    <p class="text-xs text-gray-400">Nkongsamba · Cameroun</p>
+    <!-- REPLACE HARDCODED TEXT WITH THIS: -->
+    <p class="text-sm text-gray-300 mt-1">{{ poissonnerieNom() }}</p>
+    <p class="text-xs text-gray-400">Cameroun</p>
   </div>
 
   <!-- Infos Facture -->
@@ -35,7 +36,7 @@
             <td class="py-3 font-medium text-gray-900">{{ ligne.produitNom }}<br><span class="text-xs text-gray-500 font-normal">{{ ligne.poidsKg }} kg</span></td>
             <td class="py-3 text-center text-gray-700">{{ ligne.quantiteCartons }}</td>
             <!-- En FCFA on n'affiche pas les décimales, donc on utilise juste le pipe number normal -->
-            <td class="py-3 text-right font-medium text-gray-900">{{ ligne.montantCarton | number }}</td>
+            <td class="py-3 text-right font-medium text-gray-900">{{ ligne.montantCarton | currencyFcfa }}</td>
           </tr>
         }
         <!-- Empty state if no lines -->
@@ -52,17 +53,17 @@
   <div class="bg-gray-50 p-6 border-t border-gray-200 space-y-3">
     <div class="flex justify-between text-sm">
       <span class="text-gray-600">Total Achat</span>
-      <span class="font-bold text-gray-900"> <!-- DIRECTIVE: Bind totalAchat() --> {{ totalAchat() | number:'1.2-2' }} FCFA</span>
+      <span class="font-bold text-gray-900">  {{ totalAchat() | currencyFcfa }} </span>
     </div>
     <div class="flex justify-between text-sm">
       <span class="text-gray-600">Vente Prévisible</span>
-      <span class="font-bold text-gray-900"> <!-- DIRECTIVE: Bind totalVente() --> {{ totalVente() | number:'1.2-2' }} FCFA</span>
+      <span class="font-bold text-gray-900"> {{ totalVente() | currencyFcfa }} </span>
     </div>
     <div class="flex justify-between pt-3 border-t border-gray-200">
       <span class="font-bold text-gray-900">Bénéfice Prévu</span>
       <!-- DIRECTIVE: Bind benefice() and use [ngClass] to make it green if > 0, red if < 0 -->
       <span class="font-bold" [ngClass]="{'text-fc-green': benefice() > 0, 'text-fc-red': benefice() < 0}"> 
-        <!-- YOUR CODE HERE --> {{ benefice() | number:'1.2-2' }} FCFA 
+         {{ benefice() > 0 ? '+' : '' }}{{ benefice() | currencyFcfa }} 
       </span>
     </div>
   </div>

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
+import { DatePipe, } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { firstValueFrom } from 'rxjs';
 import { AchatJournalierService } from '../../services/achat-journalier.service';
@@ -9,13 +9,14 @@ import { AuthStore } from '../../../../core/stores/auth.store';
 import { FactureDetailResponse } from '../../../../core/models/facture';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LigneFormComponent } from '../../../../shared/components/ligne-form/ligne-form.component';
+import { CurrencyFcfaPipe } from '../../../../shared/pipes/currency-fcfa.pipe';
 
 @Component({
   selector: 'app-facture-detail',
   standalone: true,
   imports: [
-    RouterLink, DatePipe, DecimalPipe, 
-    LucideAngularModule, ConfirmDialogComponent, LigneFormComponent
+    RouterLink, DatePipe, 
+    LucideAngularModule, ConfirmDialogComponent, LigneFormComponent,CurrencyFcfaPipe
   ],
   templateUrl: './facture-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -35,6 +36,8 @@ export class FactureDetailComponent {
   error = signal<string | null>(null);
   isConfirmOpen = signal(false);
   showAddForm = signal(false);
+  isDeleteConfirmOpen = signal(false);
+  ligneToDelete = signal<number | null>(null);
   
   // YOUR CODE HERE (Signaux)
 
@@ -124,22 +127,30 @@ export class FactureDetailComponent {
     }
   }
 
-  async deleteLigne(ligneId: number) {
-    const factureId = this.facture()?.id;
-    if (!factureId) return;
+  deleteLigne(ligneId: number) {
+    this.ligneToDelete.set(ligneId);
+    this.isDeleteConfirmOpen.set(true);
+  }
 
-    // Petite confirmation native rapide
-    if (!confirm("Voulez-vous vraiment supprimer ce produit de la facture ?")) return;
+  // 3. ADD THIS NEW METHOD:
+  async executeDeleteLigne() {
+    const factureId = this.facture()?.id;
+    const ligneId = this.ligneToDelete();
+    if (!factureId || !ligneId) return;
 
     this.isLoading.set(true);
     try {
       await firstValueFrom(this.achatService.deleteLigne(factureId, ligneId));
-      await this.loadFacture(factureId); // Recharge la facture
+      await this.loadFacture(factureId);
     } catch (err) {
       this.error.set("Erreur lors de la suppression de la ligne");
+    } finally {
+      this.isDeleteConfirmOpen.set(false);
+      this.ligneToDelete.set(null);
       this.isLoading.set(false);
     }
   }
+  
 
   getTotalPoids(lignes: any[] | undefined): number {
     if (!lignes) return 0;

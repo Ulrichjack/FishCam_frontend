@@ -22,6 +22,7 @@ export const routes: Routes = [
       { path: 'factures/:id', loadComponent: () => import('./features/factures/pages/facture-detail/facture-detail.component').then(m => m.FactureDetailComponent) },
       { path: 'transactions', loadComponent: () => import('./features/transactions/pages/transactions-list/transactions-list.component').then(m => m.TransactionsListComponent) },
       { path: 'dettes', loadComponent: () => import('./features/dettes/pages/dettes-list/dettes-list.component').then(m => m.DettesListComponent) },
+      { path: 'cloture', loadComponent: () => import('./features/cloture/pages/cloture-page/cloture-page.component').then(m => m.CloturePageComponent)}
     ]
    },
 

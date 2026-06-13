@@ -2,10 +2,12 @@ import { inject, Injectable, signal } from "@angular/core";
 import { DashboardService } from "../../dashboard/services/dashboard.service";
 import { CompteCourantResponse } from "../../../core/models/compte-courant.model";
 import { firstValueFrom } from "rxjs";
+import { ClientService } from "../../clients/services/client.service";
 
 @Injectable({ providedIn: 'root' })
 export class DettesStore {
   private readonly dashboardService = inject(DashboardService);
+  private readonly clientService = inject(ClientService); // <-- INJECT
 
   // --- STATE SIGNALS ---
   private readonly _debtors = signal<CompteCourantResponse[]>([]);
@@ -29,6 +31,23 @@ export class DettesStore {
       this._error.set("Failed to load debtors. Please try again.");
     } finally {
       this._isLoading.set(false);
+    }
+  }
+
+  // NOUVELLE ACTION DANS LE STORE !
+  async rembourserDette(compteCourantId: number, montant: number, description: string, poissonnerieId: number) {
+    try {
+      // 1. On fait l'appel API
+      await firstValueFrom(this.clientService.enregistrerRemboursement({
+        compteCourantId,
+        montant,
+        description
+      }));
+      // 2. On recharge la liste pour mettre à jour les cartes
+      await this.loadDebtors(poissonnerieId);
+    } catch (error) {
+      console.error("Erreur lors du remboursement", error);
+      throw error; // On renvoie l'erreur au composant pour qu'il affiche un message si besoin
     }
   }
 }

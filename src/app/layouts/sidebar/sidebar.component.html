@@ -40,7 +40,15 @@
               <lucide-icon name="triangle-alert" class="mr-3 h-5 w-5"></lucide-icon> Comptes en dette
           </a>
         }
+         @if(authStore.isPatron() || authStore.isSuperAdmin()){
+        <!-- cloture journaliere -->
+        <a routerLink="/cloture" (click)="closeRequested.emit()" routerLinkActive="text-fc-green font-semibold bg-gray-50" #rlaCloture="routerLinkActive" class="relative flex items-center rounded-md px-6 py-3 font-medium capitalize text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900">
+              @if(rlaCloture.isActive) { <span class="absolute left-0 h-4/5 w-1 bg-fc-green rounded-r-md"></span> }
+              <lucide-icon name="calendar-check" class="mr-3 h-5 w-5"></lucide-icon> Clôture journalière
+            </a>
+         }
       
+
       <!-- Livreurs -->
       <a routerLink="/livreurs" (click)="closeRequested.emit()" routerLinkActive="text-fc-green font-semibold bg-gray-50" #rlaLivreurs="routerLinkActive" class="relative flex items-center rounded-md px-6 py-3 font-medium capitalize text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900">
         @if(rlaLivreurs.isActive) { <span class="absolute left-0 h-4/5 w-1 bg-fc-green rounded-r-md"></span> }
@@ -83,10 +91,7 @@
         <div class="overflow-hidden transition-all duration-300 ease-in-out" [style.max-height.px]="isGestionMenuOpen() ? 500 : 0">
           <div class="flex flex-col pt-2">
            
-            <a routerLink="/cloture" (click)="closeRequested.emit()" routerLinkActive="text-fc-green font-semibold bg-gray-50" #rlaCloture="routerLinkActive" class="relative flex items-center rounded-md px-6 py-3 font-medium capitalize text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900">
-              @if(rlaCloture.isActive) { <span class="absolute left-0 h-4/5 w-1 bg-fc-green rounded-r-md"></span> }
-              <lucide-icon name="calendar-check" class="mr-3 h-5 w-5"></lucide-icon> Clôture journalière
-            </a>
+            
             <!-- ... autres liens du sous-menu ... -->
             <a routerLink="/bilans" (click)="closeRequested.emit()" routerLinkActive="text-fc-green font-semibold bg-gray-50" #rlaBilans="routerLinkActive" class="relative flex items-center rounded-md px-6 py-3 font-medium capitalize text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900">
               @if(rlaBilans.isActive) { <span class="absolute left-0 h-4/5 w-1 bg-fc-green rounded-r-md"></span> }

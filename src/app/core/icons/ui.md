@@ -532,7 +532,7 @@ HISTORIQUE (below, from GET /clotures/historique)
 ├──────────────────┴──────────────────┴──────────────────────────┤
 │ BÉNÉFICE NET : 448 000 FCFA 🟢                                  │
 ├─────────────────────────────────────────────────────────────────┤
-│ COMPARAISON DES BOUTIQUES (SUPER_ADMIN — GET /bilans/comparaison│
+│ COMPARAISON DES BOUTIQUES (SUPER_ADMIN — GET /bilans/comparaison)│
 │  Boutique        │ Achats    │ Ventes   │ Bénéfice              │
 │  La Référence    │ 1 840 000 │ 2 430 000│ 590 000 🟢            │
 │  Bonamoussadi    │ 1 200 000 │ 1 580 000│ 380 000 🟢            │

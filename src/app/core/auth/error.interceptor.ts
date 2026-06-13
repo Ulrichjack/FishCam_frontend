@@ -25,6 +25,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         case 404:
           message = 'Serveur introuvable (404)';
           break;
+        case 400:
         case 409:
         case 422:
             // On récupère le message spécifique envoyé par ton backend

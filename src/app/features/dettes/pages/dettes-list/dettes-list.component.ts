@@ -49,24 +49,14 @@ export class DettesListComponent implements OnInit {
 
   async onSaveTransaction(data: {amount: number, notes: string}) {
     const compte = this.selectedCompte();
-    if (!compte) return;
+    const poissonnerieId = this.authStore.activePoissonnerieId();
+    if (!compte || !poissonnerieId) return;
 
     try {
-      // Appel au backend
-      await firstValueFrom(this.clientService.enregistrerRemboursement({
-        compteCourantId: compte.id,
-        montant: data.amount,
-        description: data.notes
-      }));
-
-      // Fermer la modale et recharger la liste
+      // On appelle juste le store !
+      await this.store.rembourserDette(compte.id, data.amount, data.notes, poissonnerieId);
       this.isModalOpen.set(false);
-      const poissonnerieId = this.authStore.activePoissonnerieId();
-      if (poissonnerieId) {
-        this.store.loadDebtors(poissonnerieId);
-      }
     } catch (error) {
-      console.error("Erreur lors du remboursement", error);
       alert("Erreur lors du remboursement");
     }
   }

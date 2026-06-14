@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { CreateLigneRequest, DernierPrixResponse, LigneAchatResponse } from '../../../core/models/facture-request.model';
-import { CreateFactureRequest,  FactureDetailResponse,  FactureResponse } from '../../../core/models/facture';
+import { CreateFactureRequest,  FactureDetailResponse,  FactureResponse } from '../../../core/models/facture.model';
 
 @Injectable({
   providedIn: 'root',

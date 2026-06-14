@@ -24,6 +24,14 @@ export interface StatistiquesEpargneResponse  {
 
 }
 
+export interface StatistiquesGlobalesResponse{
+  totalClientsGlobal:number;
+  totalEpargneGlobal:number;
+  totalDettesGlobal:number;
+  detailsParBoutique: StatistiquesPoissonnerieResponse[];
+
+}
+
 
 export interface StatistiquesCompteCourantResponse {
   nombreComptesEnDette: number;
@@ -34,7 +42,7 @@ export interface StatistiquesCompteCourantResponse {
 export interface TopProduitResponse {
   nomProduit: string;
   totalCartons: number;
-  totalDepenses: number;
+  totalDepense: number;
 }
 
 export interface TopDebiteurResponse{

@@ -45,6 +45,27 @@ export class ClientDetailComponent {
         this.clientStore.loadClientDetail(Number(idParam));
       }
     });
+
+    // DIRECTIVE: Ajoute un NOUVEL effet réactif pour charger l'historique
+    // 1. Récupère le client via this.clientStore.selectedClient()
+    // 2. Récupère l'onglet actif via this.activeTab()
+    // 3. Si on a un client ET que l'onglet est 'courant' ET qu'il a un compteCourantId
+    //    -> Appelle this.clientStore.loadCompteCourantDetail(...)
+    // 4. Sinon, si l'onglet est 'epargne' ET qu'il a un epargneId
+    //    -> Appelle this.clientStore.loadEpargneDetail(...)
+    effect(() => {
+      // YOUR CODE HERE
+      const client = this.clientStore.selectedClient();
+      const tab = this.activeTab();
+
+      if (client) {
+        if (tab === 'courant' && client.compteCourantId) {
+          this.clientStore.loadCompteCourantDetail(client.compteCourantId);
+        } else if (tab === 'epargne' && client.epargneId) {
+          this.clientStore.loadEpargneDetail(client.epargneId);
+        }
+      }
+    });
   }
 
   setTab(tab: 'courant' | 'epargne') {
@@ -79,6 +100,17 @@ export class ClientDetailComponent {
       console.error('Transaction failed', error);
       const msg = error.error?.message || 'Une erreur est survenue.';
       this.modalError.set(msg);
+    }
+  }
+
+  // DIRECTIVE: Implémente la méthode pour le bouton PDF
+  // 1. Récupère l'epargneId du client sélectionné
+  // 2. S'il existe, appelle this.clientStore.downloadEpargnePdf(epargneId)
+  downloadEpargnePdf() {
+    // YOUR CODE HERE
+    const epargneId = this.clientStore.selectedClient()?.epargneId;
+    if (epargneId) {
+      this.clientStore.downloadEpargnePdf(epargneId);
     }
   }
 }

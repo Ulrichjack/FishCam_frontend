@@ -1,4 +1,4 @@
-import { FactureResponse } from './../../../core/models/facture';
+import { FactureResponse } from '../../../core/models/facture.model';
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { DashboardService } from '../services/dashboard.service';
 import { StatistiquesPoissonnerieResponse } from '../../../core/models/statistiques.model';

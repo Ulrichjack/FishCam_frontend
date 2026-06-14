@@ -8,6 +8,7 @@ import { errorInterceptor } from './core/auth/error.interceptor';
 import { lucideIconsProvider } from './core/icons/lucide-icons';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 registerLocaleData(localeFr, 'fr');
 
 export const appConfig: ApplicationConfig = {
@@ -16,6 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor])),
     lucideIconsProvider,
-    { provide: LOCALE_ID, useValue: 'fr' }
+    { provide: LOCALE_ID, useValue: 'fr' },
+    provideCharts(withDefaultRegisterables())
   ]
 };

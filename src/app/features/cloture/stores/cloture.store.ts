@@ -23,58 +23,36 @@ export class ClotureStore {
 
   // --- ACTIONS ---
 
-  // DIRECTIVE: Implement loadPreparation(poissonnerieId: number, date: string)
-  // 1. Set isLoading to true, error to null
-  // 2. Call service.preparerCloture
-  // 3. Set _preparation with result.data
-  // 4. Handle errors and finally block
-  async loadPreparation(poissonnerieId: number, date: string) {
-    // YOUR CODE HERE
+  async loadPageData(poissonnerieId: number, date: string) {
     this._isLoading.set(true);
     this._error.set(null);
     try {
-      const response = await firstValueFrom(this.clotureService.preparerCloture(poissonnerieId, date));
-      this._preparation.set(response.data);
+      // On lance les deux requêtes en parallèle (plus rapide et un seul loading)
+      const [prepRes, histRes] = await Promise.all([
+        firstValueFrom(this.clotureService.preparerCloture(poissonnerieId, date)),
+        firstValueFrom(this.clotureService.getHistorique(poissonnerieId))
+      ]);
+      this._preparation.set(prepRes.data);
+      this._historique.set(histRes.data);
     } catch (error: any) {
-      this._error.set(error.message || 'An error occurred while loading preparation.');
+      this._error.set(error.message || 'Erreur lors du chargement des données.');
     } finally {
       this._isLoading.set(false);
     }
   }
 
-  // DIRECTIVE: Implement loadHistorique(poissonnerieId: number)
-  // 1. Set isLoading to true, error to null
-  // 2. Call service.getHistorique
-  // 3. Set _historique with result.data
-  // 4. Handle errors and finally block
-  async loadHistorique(poissonnerieId: number) {
-    // YOUR CODE HERE
-    this._isLoading.set(true);
-    this._error.set(null);
-    try {
-      const response = await firstValueFrom(this.clotureService.getHistorique(poissonnerieId));
-      this._historique.set(response.data);
-    } catch (error: any) {
-      this._error.set(error.message || 'An error occurred while loading historique.');
-    } finally {
-      this._isLoading.set(false);
-    }
-  }
-
-  // DIRECTIVE: Implement submitCloture(request: ClotureJournaliereRequest)
-  // 1. Set isLoading to true, error to null
-  // 2. Call service.cloturer
-  // 3. Reload the historique by calling this.loadHistorique(request.poissonnerieId)
-  // 4. Handle errors and finally block
+  // (Garde la fonction submitCloture, mais modifie-la pour qu'elle appelle le endpoint d'historique directement)
   async submitCloture(request: ClotureJournaliereRequest) {
-    // YOUR CODE HERE
     this._isLoading.set(true);
     this._error.set(null);
     try {
       await firstValueFrom(this.clotureService.cloturer(request));
-      await this.loadHistorique(request.poissonnerieId);
+      // Après la clôture, on recharge juste l'historique manuellement
+      const histRes = await firstValueFrom(this.clotureService.getHistorique(request.poissonnerieId));
+      this._historique.set(histRes.data);
     } catch (error: any) {
-      this._error.set(error.message || 'An error occurred while submitting cloture.');
+      this._error.set(error.message || 'Erreur lors de la clôture.');
+      throw error; // Important de jeter l'erreur pour ne pas fermer la modale si ça plante
     } finally {
       this._isLoading.set(false);
     }

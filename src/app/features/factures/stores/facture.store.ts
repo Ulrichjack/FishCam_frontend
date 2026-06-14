@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from "@angular/core";
 import { AchatJournalierService } from "../services/achat-journalier.service";
-import { FactureResponse } from "../../../core/models/facture";
+import { FactureResponse } from "../../../core/models/facture.model";
 import { firstValueFrom } from "rxjs";
 
 

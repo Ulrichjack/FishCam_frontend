@@ -78,8 +78,8 @@ export class CloturePageComponent implements OnInit {
 
   // Ajoute ceci juste en dessous de "readonly ecart = computed(...)"
   readonly isAlreadyClosed = computed(() => {
-    const date = this.selectedDate();
-    return this.store.historique().some(h => h.date === date);
+    const date = this.selectedDate(); // ex: "2026-05-08"
+    return this.store.historique().some(h => h.date.startsWith(date));
   });
 
   constructor() {
@@ -101,8 +101,7 @@ export class CloturePageComponent implements OnInit {
   loadData(): void {
     const poissonnerieId = this.authStore.activePoissonnerieId();
     if (poissonnerieId) {
-      this.store.loadPreparation(poissonnerieId, this.selectedDate());
-      this.store.loadHistorique(poissonnerieId);
+      this.store.loadPageData(poissonnerieId, this.selectedDate()); 
     }
   }
 

@@ -142,10 +142,50 @@
             }
           </div>
 
-          <div class="p-8 text-center border-2 border-dashed border-gray-200 rounded-xl">
-            <lucide-icon name="arrow-left-right" class="h-8 w-8 mx-auto mb-2 text-gray-400"></lucide-icon>
-            <p class="text-gray-500">L'historique des transactions viendra ici.</p>
-          </div>
+          <!-- Remplacer le div placeholder par ceci : -->
+          @if (clientStore.isHistoryLoading()) {
+            <div class="flex justify-center py-8">
+              <lucide-icon name="loader-circle" class="h-6 w-6 animate-spin text-fc-green"></lucide-icon>
+            </div>
+          } @else if (clientStore.compteCourantDetail(); as ccDetail) {
+            <div class="overflow-x-auto border border-gray-200 rounded-lg">
+              <table class="w-full text-sm text-left">
+                <thead class="bg-gray-50 text-gray-500 border-b border-gray-200">
+                  <tr>
+                    <th class="px-4 py-3 font-medium">Date</th>
+                    <th class="px-4 py-3 font-medium">Opération</th>
+                    <th class="px-4 py-3 font-medium text-right">Montant</th>
+                    <th class="px-4 py-3 font-medium text-right">Solde après</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  @for (tx of ccDetail.transactions; track tx.id) {
+                    <tr class="hover:bg-gray-50">
+                      <td class="px-4 py-3 text-gray-900">{{ tx.transactionDate | date:'dd/MM/yyyy HH:mm' }}</td>
+                      <td class="px-4 py-3">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                              [class.bg-fc-red-light]="tx.type === 'EMPRUNT'" [class.text-fc-red]="tx.type === 'EMPRUNT'"
+                              [class.bg-fc-green-light]="tx.type === 'REMBOURSEMENT'" [class.text-fc-green]="tx.type === 'REMBOURSEMENT'">
+                          {{ tx.type }}
+                        </span>
+                        <div class="mt-1 text-xs text-gray-500">
+                          @if (tx.description) { <p>{{ tx.description }}</p> }
+                          @if (tx.notes) { <p class="italic text-gray-400">Note: {{ tx.notes }}</p> }
+                        </div>
+                      </td>
+                      <td class="px-4 py-3 text-right font-bold"
+                          [class.text-fc-red]="tx.type === 'EMPRUNT'" [class.text-fc-green]="tx.type === 'REMBOURSEMENT'">
+                        {{ tx.type === 'EMPRUNT' ? '-' : '+' }}{{ tx.montant | currencyFcfa }}
+                      </td>
+                      <td class="px-4 py-3 text-right text-gray-600">{{ tx.soldeApres | currencyFcfa }}</td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">Aucune transaction</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
         } @else {
           <!-- Le client N'A PAS de compte courant -->
           <div class="flex flex-col items-center justify-center py-12 text-center">
@@ -192,12 +232,51 @@
               class="px-4 py-2 bg-fc-yellow-dark hover:bg-fc-yellow text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               Faire un Retrait
             </button>
+            @if (!authStore.isEnregistreur()) {
+              <button (click)="downloadEpargnePdf()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ml-auto border border-gray-300">
+                <lucide-icon name="file-text" class="h-4 w-4"></lucide-icon>
+                Fiche PDF
+              </button>
+            }
           </div>
 
-          <div class="p-8 text-center border-2 border-dashed border-gray-200 rounded-xl">
-            <lucide-icon name="piggy-bank" class="h-8 w-8 mx-auto mb-2 text-gray-400"></lucide-icon>
-            <p class="text-gray-500">L'historique des dépôts et retraits sera affiché ici.</p>
+          @if (clientStore.isHistoryLoading()) {
+          <div class="flex justify-center py-8">
+            <lucide-icon name="loader-circle" class="h-6 w-6 animate-spin text-fc-green"></lucide-icon>
           </div>
+        } @else if (clientStore.epargneDetail(); as epargneDetail) {
+          <div class="overflow-x-auto border border-gray-200 rounded-lg">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-gray-50 text-gray-500 border-b border-gray-200">
+                <tr>
+                  <th class="px-4 py-3 font-medium">Date</th>
+                  <th class="px-4 py-3 font-medium">Opération</th>
+                  <th class="px-4 py-3 font-medium text-right">Montant</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                @for (tx of epargneDetail.transactions; track tx.id) {
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-gray-900">{{ tx.transactionDate | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                            [class.bg-fc-red-light]="tx.type === 'RETRAIT'" [class.text-fc-red]="tx.type === 'RETRAIT'"
+                            [class.bg-fc-green-light]="tx.type === 'DEPOT'" [class.text-fc-green]="tx.type === 'DEPOT'">
+                        {{ tx.type }}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 text-right font-bold"
+                        [class.text-fc-red]="tx.type === 'RETRAIT'" [class.text-fc-green]="tx.type === 'DEPOT'">
+                      {{ tx.type === 'RETRAIT' ? '-' : '+' }}{{ tx.amount | currencyFcfa }}
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="3" class="px-4 py-8 text-center text-gray-500">Aucune transaction</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
         } @else {
           <!-- Le client N'A PAS d'épargne -->
           <div class="flex flex-col items-center justify-center py-12 text-center">

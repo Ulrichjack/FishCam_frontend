@@ -26,11 +26,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           message = 'Serveur introuvable (404)';
           break;
         case 400:
-        case 409:
-        case 422:
-            // On récupère le message spécifique envoyé par ton backend
-            message = error.error?.message || "Données invalides ou déjà existantes";
-            break;
+                  case 409:
+                  case 422:
+                      // On récupère le message spécifique envoyé par ton backend
+                      message = error.error?.message || error.message || error.error || "Données invalides ou déjà existantes";
+                      break;
         case 500:
           message = 'Erreur serveur (500)';
           break;

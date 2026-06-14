@@ -6,7 +6,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { firstValueFrom } from 'rxjs';
 import { AchatJournalierService } from '../../services/achat-journalier.service';
 import { AuthStore } from '../../../../core/stores/auth.store';
-import { FactureDetailResponse } from '../../../../core/models/facture';
+import { FactureDetailResponse } from '../../../../core/models/facture.model';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LigneFormComponent } from '../../../../shared/components/ligne-form/ligne-form.component';
 import { CurrencyFcfaPipe } from '../../../../shared/pipes/currency-fcfa.pipe';
@@ -91,24 +91,28 @@ export class FactureDetailComponent {
 
   
   async downloadPdf() {
-    // YOUR CODE HERE
-    const factureId = this.facture()?.id;
-    if (!factureId) return;
+    const fact = this.facture();
+    if (!fact) return;
 
-    try{
-
-      const blob = await firstValueFrom(this.achatService.downloadFacturePdf(factureId));
+    try {
+      const blob = await firstValueFrom(this.achatService.downloadFacturePdf(fact.id));
       const url = window.URL.createObjectURL(blob);
+      
+      // 1. Nettoyer le nom du fournisseur (remplacer espaces par des tirets)
+      const cleanFournisseur = fact.fournisseurNom.replace(/[^a-zA-Z0-9]/g, '_');
+      
+      // 2. Créer le beau nom de fichier
+      const beauNom = `Facture_${cleanFournisseur}_${fact.dateAchat}.pdf`;
       
       const a = document.createElement('a');
       a.href = url;
-      a.download = `facture_${factureId}.pdf`;
+      a.download = beauNom; // ✅ On utilise le beau nom ici !
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
-    }catch(error){
+    } catch(error) {
       this.error.set('Erreur lors du téléchargement du PDF');
     }
   }

@@ -1,9 +1,12 @@
+import { PoissonnerieResponse } from "./PoissonnerieResponse.model";
+
 export interface NotificationResponse
 {
   id: number;
   type: TypeNotification;
   message: string;
   read: boolean;
+  poissonnerie: PoissonnerieResponse;
   createdAt: string;
 }
 

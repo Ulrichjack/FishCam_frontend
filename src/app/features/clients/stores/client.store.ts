@@ -1,17 +1,24 @@
 import { TransactionMode } from '../../../shared/components/transaction-form/transaction-form.component';
 import { Injectable, inject, signal } from '@angular/core';
 import { PageResponse } from '../../../core/models/api-response.model';
-import { ClientResponse } from '../../../core/models/compte-courant.model';
+import { ClientResponse, CompteCourantDetailResponse } from '../../../core/models/compte-courant.model';
 import { firstValueFrom } from 'rxjs';
 import { ClientService } from '../services/client.service';
 import { CreateClientRequest } from '../models/client-request.model';
 import { ClientDetailResponse } from '../models/client.model';
+import { CompteCourantService } from '../services/compte-courant.service';
+import { EpargneService } from '../services/epargne.service';
+import { ExportService } from '../../../shared/pipes/services/export.service';
+import { EpargneDetailResponse } from '../../../core/models/epargne.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClientStore {
   private readonly clientService = inject(ClientService);
+  private readonly compteCourantService = inject(CompteCourantService);
+  private readonly epargneService = inject(EpargneService);
+  private readonly exportService = inject(ExportService);
 
   // --- STATE SIGNALS ---
   private readonly _clientsPage = signal<PageResponse<ClientResponse> | null>(null);
@@ -20,6 +27,9 @@ export class ClientStore {
   private readonly _currentSearchTerm = signal<string>('');
   private readonly _selectedClient = signal<ClientDetailResponse | null>(null);
   private readonly _showInactive = signal<boolean>(false);
+  private readonly _compteCourantDetail = signal<CompteCourantDetailResponse | null>(null);
+  private readonly _epargneDetail = signal<EpargneDetailResponse | null>(null);
+  private readonly _isHistoryLoading = signal<boolean>(false); 
 
   // --- READONLY SIGNALS ---
   readonly clientsPage = this._clientsPage.asReadonly();
@@ -28,6 +38,9 @@ export class ClientStore {
   readonly currentSearchTerm = this._currentSearchTerm.asReadonly();
   readonly selectedClient = this._selectedClient.asReadonly();
   readonly showInactive = this._showInactive.asReadonly();
+  readonly compteCourantDetail = this._compteCourantDetail.asReadonly();
+  readonly epargneDetail = this._epargneDetail.asReadonly();
+  readonly isHistoryLoading = this._isHistoryLoading.asReadonly();
 
   // --- ACTIONS ---
   async loadClients(poissonnerieId: number, page: number = 0) {
@@ -275,6 +288,81 @@ export class ClientStore {
       this._isLoading.set(false);
     }
   }
+
+
+  // DIRECTIVE: 
+  // 1. Set _isHistoryLoading à true, _error à null
+  // 2. Appelle compteCourantService.getCompteCourantDetail(compteId)
+  // 3. Met à jour _compteCourantDetail avec response.data
+  // 4. Gère le catch (erreur) et le finally (loading false)
+  async loadCompteCourantDetail(compteId: number) {
+    // YOUR CODE HERE
+    this._isHistoryLoading.set(true);
+    this._error.set(null);
+    
+    try {
+      const response = await firstValueFrom(this.compteCourantService.getCompteCourantDetail(compteId));
+      this._compteCourantDetail.set(response.data);
+    } catch (err) {
+      this._error.set('Erreur lors du chargement du compte courant. Veuillez réessayer.');
+    } finally {
+      this._isHistoryLoading.set(false);
+    }
+  }
+
+  // DIRECTIVE: 
+  // 1. Set _isHistoryLoading à true, _error à null
+  // 2. Appelle epargneService.getEpargneDetail(epargneId)
+  // 3. Met à jour _epargneDetail avec response.data
+  // 4. Gère le catch (erreur) et le finally (loading false)
+  async loadEpargneDetail(epargneId: number) {
+    // YOUR CODE HERE
+    this._isHistoryLoading.set(true);
+    this._error.set(null);
+    try {
+      const response = await firstValueFrom(this.epargneService.getEpargneDetail(epargneId));
+      this._epargneDetail.set(response.data);
+    } catch (err) {
+      this._error.set('Erreur lors du chargement de l’épargne. Veuillez réessayer.');
+    } finally {
+      this._isHistoryLoading.set(false);
+    }
+  }
+
+  // DIRECTIVE: 
+  // 1. Appelle exportService.downloadEpargnePdf(epargneId)
+  // 2. Récupère le Blob
+  // 3. Crée une URL locale avec : const url = window.URL.createObjectURL(blob);
+  // 4. Crée un élément <a> invisible, set son href à l'url, son download à 'fiche_epargne.pdf'
+  // 5. Simule un clic : a.click()
+  // 6. Nettoie l'URL : window.URL.revokeObjectURL(url);
+  async downloadEpargnePdf(epargneId: number) {
+    // YOUR CODE HERE
+    const epargne = this._epargneDetail();
+    if (!epargne) {
+      this._error.set('Détails de l’épargne non chargés. Veuillez réessayer.');
+      return;
+    }
+    try {
+      const blob = await firstValueFrom(this.exportService.downloadEpargnePdf(epargneId));
+      const url = window.URL.createObjectURL(blob);
+      
+      const cleanClient = epargne.client.lastName.replace(/[^a-zA-Z0-9]/g, '_') + ' ' + epargne.client.firstName.replace(/[^a-zA-Z0-9]/g, '_');
+      const filename = `fiche_epargne_${cleanClient}_${epargne.createdAt}.pdf`;
+      
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      this._error.set('Erreur lors du téléchargement du PDF. Veuillez réessayer.');
+    }
+  }
+
 
 
 }

@@ -8,8 +8,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { TransactionFormComponent } from '../../../../shared/components/transaction-form/transaction-form.component';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 import { CompteCourantResponse } from '../../../../core/models/compte-courant.model';
-import { ClientService } from '../../../clients/services/client.service';
-import { firstValueFrom } from 'rxjs';
+
 
 @Component({
   selector: 'app-dettes-list',
@@ -27,7 +26,6 @@ export class DettesListComponent implements OnInit {
   
    readonly store = inject(DettesStore);
   private readonly authStore = inject(AuthStore);
-  private readonly clientService = inject(ClientService);
 
   readonly isModalOpen = signal(false);
   readonly selectedCompte = signal<CompteCourantResponse | null>(null);

@@ -1,3 +1,83 @@
+
+
+
+
+
+JMeter ou Gatling : Des logiciels gratuits pour simuler 50 caissières qui enregistrent des factures en même temps.
+Cypress ou Playwright : Pour simuler des clics automatiques sur l'interface Angular.
+VisualVM : Pour surveiller la RAM de Spring Boot en direct.
+
+
+
+# ╔══════════════════════════════════════════════════════════════════════╗
+# ║        FISHCAM ERP — MASTER PROMPT v5.0 (PHASE DÉPLOIEMENT)          ║
+# ║        Angular 20 · Spring Boot 3 · Docker · Xubuntu                 ║
+# ╚══════════════════════════════════════════════════════════════════════╝
+
+## 🔁 CONTINUITY BLOCK — READ THIS FIRST
+PROJECT   : FishCam ERP — Poissonnerie Management System, Cameroon
+DEVELOPER : Ulrich — Licence 3, 2026, Douala
+SERVER    : HP Desktop, Xubuntu, 4GB RAM, 256GB HDD, Docker installé
+IP SERVER : 192.168.8.100 (Réseau local)
+
+### Phase Status
+✅ PHASES 1 à 13 — DÉVELOPPEMENT FRONTEND & BACKEND → TERMINÉ À 100%
+🔲 PHASE 14 — DÉPLOIEMENT DOCKER (XUBUNTU)          → EN COURS
+🔲 PHASE 15 — TESTS DE MONTÉE EN CHARGE (LOAD TEST) → NOT STARTED
+🔲 PHASE 16 — CORRECTIONS POST-DÉPLOIEMENT          → NOT STARTED
+
+---
+
+## 🐳 PHASE 14 — DÉPLOIEMENT DOCKER (L'OBJECTIF ACTUEL)
+
+L'application doit tourner sur le vieux PC Xubuntu (4Go RAM). 
+Contraintes strictes de RAM pour éviter le crash du serveur :
+- PostgreSQL : Limité via configuration de base.
+- Spring Boot : Limité via JAVA_OPTS (`-Xms512m -Xmx1g`).
+- Angular : Servi par Nginx Alpine (très léger).
+
+### Ordre de création des fichiers (Méthode Squelette -> Ulrich -> Claude) :
+STEP 14.1 : `Dockerfile` pour le Backend (Spring Boot)
+STEP 14.2 : `Dockerfile` pour le Frontend (Angular + Nginx)
+STEP 14.3 : `nginx.conf` (Configuration du reverse proxy et routage Angular)
+STEP 14.4 : `docker-compose.yml` (Orchestration globale : DB + Backend + Frontend)
+STEP 14.5 : Script bash de déploiement (`deploy.sh`)
+
+---
+
+## 🧪 PHASE 15 — TESTS GLOBAUX (APRÈS DÉPLOIEMENT)
+
+Une fois l'application en ligne sur `http://192.168.8.100`, nous ferons :
+1. Test de concurrence : 2 utilisateurs modifient le même compte courant.
+2. Test de charge : Script Python/JMeter pour insérer 1000 factures en 1 minute.
+3. Test de résilience : Couper le réseau (câble RJ45) pendant une transaction.
+
+---
+
+## 🔒 HOW WE WORK — THE METHOD (TOUJOURS ACTIVE)
+
+Même pour le DevOps (Docker), on garde la méthode d'apprentissage :
+STEP 1 — QUESTION : Claude pose une question sur Docker/Nginx.
+STEP 2 — SKELETON : Claude donne la structure du fichier (ex: Dockerfile vide avec commentaires).
+STEP 3 — RESEARCH : Ulrich cherche comment écrire les commandes Docker.
+STEP 4 — SEND : Ulrich envoie le fichier complété.
+STEP 5 — VALIDATE : Claude corrige et valide.
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║   FISHCAM ERP — COMPLETE UI SPECIFICATION                       ║
 # ║   All Pages · All Modals · All Slide-Overs · All Messages       ║

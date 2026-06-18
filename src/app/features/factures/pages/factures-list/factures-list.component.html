@@ -75,7 +75,7 @@
                     </button>
 
                     <!-- Bouton Clôturer (Seulement si non clôturée ET (Patron ou SuperAdmin)) -->
-                    @if (!facture.cloture && (authStore.isPatron() || authStore.isSuperAdmin())) {
+                    @if (!facture.cloture && (authStore.isPatron() || authStore.isSuperAdmin() || authStore.isCaissiere())){
                       <button (click)="openCloseDialog(facture.id)" class="flex items-center gap-1.5 px-2 py-1.5 text-xs font-medium text-fc-red bg-fc-red-light hover:bg-fc-red hover:text-white rounded-md transition-colors">
                         <lucide-icon name="lock" class="h-3.5 w-3.5"></lucide-icon>
                         Clôturer

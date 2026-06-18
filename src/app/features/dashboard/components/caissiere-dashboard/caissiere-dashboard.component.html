@@ -7,7 +7,8 @@
 
   <!-- 2. SUMMARY CARDS (Using Reusable Components!) -->
   <!-- 2. SUMMARY CARDS -->
-  @if (dashboardStore.stats()) {
+  <!-- 2. SUMMARY CARDS -->
+  @if (dashboardStore.stats(); as stats) {
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       
       <app-stat-card
@@ -18,16 +19,16 @@
       </app-stat-card>
 
       <app-stat-card
-        label="Emprunts aujourd'hui"
-        [value]="0 + ' FCFA'"
+        label="Total Dettes Clients"
+        [value]="stats.courantResponse.totalDettes | currencyFcfa"
         icon="trending-down"
         colorVariant="red">
       </app-stat-card>
 
       <app-stat-card
-        label="Remboursements aujourd'hui"
-        [value]="dashboardStore.stats()!.epargnes.totalEpargne + ' FCFA'"
-        icon="circle-check"
+        label="Total Épargnes Clients"
+        [value]="stats.epargnes.totalEpargne | currencyFcfa"
+        icon="circle-dollar-sign"
         colorVariant="green">
       </app-stat-card>
 

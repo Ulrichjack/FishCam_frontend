@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { DashboardStore } from '../../stores/dashboard.store';
 import { NotificationStore } from '../../../notifications/stores/notification.store';
@@ -8,9 +8,9 @@ import { NotificationPreviewComponent } from '../../components/notification-prev
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 import { TransactionFormComponent, TransactionMode } from '../../../../shared/components/transaction-form/transaction-form.component';
 import { LucideAngularModule } from 'lucide-angular';
-// DIRECTIVE: Import the StatCardComponent
 import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card.component';
 import { GreetingHeaderComponent } from '../../../../shared/components/greeting-header/greeting-header.component';
+import { CurrencyFcfaPipe } from '../../../../shared/pipes/currency-fcfa.pipe'; // <-- AJOUT ICI
 
 @Component({
   selector: 'app-caissiere-dashboard',
@@ -19,8 +19,9 @@ import { GreetingHeaderComponent } from '../../../../shared/components/greeting-
     LucideAngularModule,
     AlertRibbonComponent, NotificationPreviewComponent,
     ModalComponent, TransactionFormComponent, GreetingHeaderComponent,
-    StatCardComponent // <-- ADDED HERE
-],
+    StatCardComponent,
+    CurrencyFcfaPipe // <-- AJOUT ICI
+  ],
   templateUrl: './caissiere-dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -31,12 +32,10 @@ export class CaissiereDashboardComponent {
 
   readonly today = new Date();
 
-  // Modal state
   readonly isModalOpen = signal<boolean>(false);
   readonly modalTitle = signal<string>('');
   readonly currentAction = signal<TransactionMode | null>(null);
 
-  // DIRECTIVE: Calculate the number of invoices today
   readonly facturesCount = computed(() => {
     const factures = this.dashboardStore.facturesDuJour();
     return factures ? factures.length : 0;

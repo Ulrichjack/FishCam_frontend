@@ -53,12 +53,22 @@
         </div>
 
         <div class="flex items-center gap-3 shrink-0">
+
+
+          @if (!hasEvaluation() ) {
+              <button (click)="openEvaluationModal()"
+                      class="flex items-center gap-2 px-4 py-2 bg-fc-yellow-light hover:bg-fc-yellow text-fc-yellow-dark hover:text-white text-sm font-medium rounded-lg transition-colors">
+                <lucide-icon name="star" class="h-4 w-4"></lucide-icon>
+                Évaluer la livraison
+              </button>
+            }
+
           <button (click)="downloadPdf()"
                   class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors">
             <lucide-icon name="file-text" class="h-4 w-4"></lucide-icon>
             PDF
           </button>
-          @if (!fact.cloture && (authStore.isPatron() || authStore.isSuperAdmin())) {
+          @if (!fact.cloture && (authStore.isPatron() || authStore.isSuperAdmin() || authStore.isCaissiere())) {
             <button (click)="openCloseDialog()"
                     class="flex items-center gap-2 px-4 py-2 bg-fc-green hover:bg-fc-green-dark text-white text-sm font-medium rounded-lg transition-colors">
               <lucide-icon name="lock" class="h-4 w-4"></lucide-icon>
@@ -193,6 +203,47 @@
         </div>
       </div>
 
+      <!-- 3.5 ÉVALUATION DU LIVREUR (Si elle existe) -->
+      @if (evaluation(); as eval) {
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+              <lucide-icon name="truck" class="h-4 w-4 text-gray-500"></lucide-icon>
+              Livré par : {{ eval.livreurPrenom }} {{ eval.livreurNom }}
+            </h3>
+            <p class="text-xs text-gray-500 mt-1">Évalué par {{ eval.evaluatorNom }} le {{ eval.dateEvaluation | date:'dd/MM/yyyy' }}</p>
+            @if (eval.commentaire) {
+              <p class="text-sm text-gray-700 mt-2 italic">"{{ eval.commentaire }}"</p>
+            }
+          </div>
+          <div class="flex flex-col gap-2 min-w-50">
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-gray-600">Qualité :</span>
+              <div class="flex text-fc-yellow">
+                <!-- On simule les étoiles pleines -->
+                @for (i of [1,2,3,4,5]; track i) {
+                  <lucide-icon name="star" class="h-4 w-4" [class.fill-fc-yellow]="i <= eval.qualiteProduit" [class.text-gray-300]="i > eval.qualiteProduit"></lucide-icon>
+                }
+              </div>
+            </div>
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-gray-600">Poids :</span>
+              <div class="flex text-fc-yellow">
+                @for (i of [1,2,3,4,5]; track i) {
+                  <lucide-icon name="star" class="h-4 w-4" [class.fill-fc-yellow]="i <= eval.respectPoids" [class.text-gray-300]="i > eval.respectPoids"></lucide-icon>
+                }
+              </div>
+            </div>
+            @if (eval.problemeSignale) {
+              <span class="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded mt-1">
+                <lucide-icon name="triangle-alert" class="h-3 w-3"></lucide-icon> Problème signalé
+              </span>
+            }
+          </div>
+        </div>
+      }
+
+
     </div>
 
   }
@@ -215,3 +266,59 @@
   (cancelled)="isDeleteConfirmOpen.set(false)"
   (confirmed)="executeDeleteLigne()">
 </app-confirm-dialog>
+
+<!-- Modale d'évaluation -->
+<app-modal
+  [isOpen]="isEvalModalOpen()"
+  title="Évaluer la livraison"
+  (closed)="isEvalModalOpen.set(false)">
+  
+  <form [formGroup]="evalForm" (ngSubmit)="submitEvaluation()" class="p-6 flex flex-col gap-5">
+    
+    <!-- Livreur -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Livreur *</label>
+      <select formControlName="livreurId" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none bg-white">
+        <option [ngValue]="null">Sélectionner le livreur...</option>
+        @for (l of livreurs(); track l.id) {
+          <option [ngValue]="l.id">{{ l.prenom }} {{ l.nom }} ({{ l.fournisseurNom }})</option>
+        }
+      </select>
+    </div>
+
+    <!-- Qualité -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Qualité du poisson (1 à 5) *</label>
+      <app-star-rating formControlName="qualiteProduit"></app-star-rating>
+    </div>
+
+    <!-- Poids -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Respect du poids (1 à 5) *</label>
+      <app-star-rating formControlName="respectPoids"></app-star-rating>
+    </div>
+
+    <!-- Problème signalé -->
+    <div class="flex items-center gap-2 mt-2">
+      <input type="checkbox" id="probleme" formControlName="problemeSignale" class="h-4 w-4 text-fc-red focus:ring-fc-red border-gray-300 rounded">
+      <label for="probleme" class="text-sm font-medium text-gray-700">Signaler un problème grave (Vol, avarié...)</label>
+    </div>
+
+    <!-- Commentaire -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Commentaire (Optionnel)</label>
+      <textarea formControlName="commentaire" rows="3" placeholder="Détails sur la livraison..."
+                class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none"></textarea>
+    </div>
+
+    <button type="submit" [disabled]="evalForm.invalid || isLoading()" 
+            class="mt-2 w-full bg-fc-green hover:bg-fc-green-dark text-white font-bold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 flex justify-center items-center gap-2">
+      @if (isLoading()) {
+        <lucide-icon name="loader-circle" class="h-5 w-5 animate-spin"></lucide-icon>
+      } @else {
+        <lucide-icon name="circle-check" class="h-5 w-5"></lucide-icon>
+      }
+      Soumettre l'évaluation
+    </button>
+  </form>
+</app-modal>

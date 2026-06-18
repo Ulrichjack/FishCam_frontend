@@ -1,6 +1,5 @@
-import { PoissonnerieResponse } from "./PoissonnerieResponse.model";
+import { PoissonnerieResponse } from "./poissonnerie-response.model";
 import { TransactionCCResponse } from "./transaction.model";
-import { UserResponse } from "./user.model";
 
 export enum StatutCompteCourant {
   ACTIF = 'ACTIF',
@@ -35,8 +34,6 @@ export interface CompteCourantResponse {
   dateOuverture: string;
   updatedAt: string;
 }
-
-
 
 export interface CompteCourantDetailResponse {
   id: number;

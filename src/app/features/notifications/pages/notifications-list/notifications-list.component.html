@@ -30,6 +30,16 @@
         Toutes
       </button>
 
+       <button (click)="setFilter(TypeNotification.RAPPORT_JOURNALIER)"
+              class="px-6 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap"
+              [class.border-fc-green]="notificationStore.activeFilter() === TypeNotification.RAPPORT_JOURNALIER"
+              [class.text-fc-green]="notificationStore.activeFilter() === TypeNotification.RAPPORT_JOURNALIER"
+              [class.border-transparent]="notificationStore.activeFilter() !== TypeNotification.RAPPORT_JOURNALIER"
+              [class.text-gray-500]="notificationStore.activeFilter() !== TypeNotification.RAPPORT_JOURNALIER">
+        Rapports
+      </button>
+
+
       <!-- UTILISATION DE L'ENUM TypeNotification ICI -->
       <button (click)="setFilter(TypeNotification.COMPTE_COURANT_ALERTE)"
               class="px-6 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap"
@@ -49,15 +59,7 @@
         Soldes
       </button>
 
-      <button (click)="setFilter(TypeNotification.RAPPORT_JOURNALIER)"
-              class="px-6 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap"
-              [class.border-fc-green]="notificationStore.activeFilter() === TypeNotification.RAPPORT_JOURNALIER"
-              [class.text-fc-green]="notificationStore.activeFilter() === TypeNotification.RAPPORT_JOURNALIER"
-              [class.border-transparent]="notificationStore.activeFilter() !== TypeNotification.RAPPORT_JOURNALIER"
-              [class.text-gray-500]="notificationStore.activeFilter() !== TypeNotification.RAPPORT_JOURNALIER">
-        Rapports
-      </button>
-
+     
       <button (click)="setFilter(TypeNotification.INFO)"
               class="px-6 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap"
               [class.border-fc-green]="notificationStore.activeFilter() === TypeNotification.INFO"
@@ -81,21 +83,26 @@
           <!-- Icon based on type -->
           <div class="shrink-0 mt-1">
             @switch (n.type) {
-              @case ('COMPTE_COURANT_ALERTE') {
-                <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-fc-red">
-                  <lucide-icon name="triangle-alert" class="h-5 w-5"></lucide-icon>
-                </div>
-              }
-              @case ('COMPTE_SOLDE') {
-                <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-fc-green">
-                  <lucide-icon name="circle-check" class="h-5 w-5"></lucide-icon>
-                </div>
-              }
               @case ('RAPPORT_JOURNALIER') {
                 <div class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
                   <lucide-icon name="chart-bar" class="h-5 w-5"></lucide-icon>
                 </div>
               }
+
+
+              @case ('COMPTE_COURANT_ALERTE') {
+                <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-fc-red">
+                  <lucide-icon name="triangle-alert" class="h-5 w-5"></lucide-icon>
+                </div>
+              }
+
+              
+              @case ('COMPTE_SOLDE') {
+                <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-fc-green">
+                  <lucide-icon name="circle-check" class="h-5 w-5"></lucide-icon>
+                </div>
+              }
+              
               @default {
                 <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
                   <lucide-icon name="info" class="h-5 w-5"></lucide-icon>

@@ -47,6 +47,12 @@ import {
   Save,
   Lock,
   ArrowRight,
+  Pause,
+  Star,
+  CloudUpload,
+  Wifi,
+  CircleX,
+  Archive
 
  
 
@@ -100,6 +106,12 @@ const icons = {
   Save,
   Lock,
   ArrowRight,
+  Pause,
+  Star,
+  CloudUpload,
+  Wifi,
+  CircleX,
+  Archive
 
 };
 

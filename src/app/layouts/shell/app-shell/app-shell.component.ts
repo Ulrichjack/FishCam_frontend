@@ -46,6 +46,13 @@ export class AppShellComponent  {
         if (url.includes('/produits')) return 'Produits';
         if (url.includes('/fournisseurs')) return 'Fournisseurs';
         if (url.includes('/notifications')) return 'Notifications';
+        if (url.includes('/poissonneries')) return 'Poissonneries';
+        if (url.includes('/equipe')) return 'Équipe';
+        if (url.includes('/audit')) return 'Audit';
+        if (url.includes('/bilans')) return 'Bilans';
+        if (url.includes('/statistiques')) return 'Statistiques';
+        if (url.includes('/cloture')) return 'Clôture de caisse';
+        if (url.includes('/backup')) return 'Sauvegarde';
         return 'Tableau de bord';
       })
     ),

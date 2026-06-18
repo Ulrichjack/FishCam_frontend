@@ -1,4 +1,4 @@
-import { PoissonnerieResponse } from "../../../core/models/PoissonnerieResponse.model";
+import { PoissonnerieResponse } from "../../../core/models/poissonnerie-response.model";
 
 export interface ClientDetailResponse {
   id: number;

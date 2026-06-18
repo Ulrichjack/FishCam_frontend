@@ -10,6 +10,7 @@ import { CompteCourantService } from '../services/compte-courant.service';
 import { EpargneService } from '../services/epargne.service';
 import { ExportService } from '../../../shared/pipes/services/export.service';
 import { EpargneDetailResponse } from '../../../core/models/epargne.model';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,7 @@ export class ClientStore {
   private readonly compteCourantService = inject(CompteCourantService);
   private readonly epargneService = inject(EpargneService);
   private readonly exportService = inject(ExportService);
+  private readonly toastService = inject(ToastService);
 
   // --- STATE SIGNALS ---
   private readonly _clientsPage = signal<PageResponse<ClientResponse> | null>(null);
@@ -43,27 +45,15 @@ export class ClientStore {
   readonly isHistoryLoading = this._isHistoryLoading.asReadonly();
 
   // --- ACTIONS ---
-  async loadClients(poissonnerieId: number, page: number = 0) {
-    // 1. TODO: Set isLoading to true, error to null
+  async loadClients(poissonnerieId: number, page: number = 0, size: number = 20) {
     this._isLoading.set(true);
     this._error.set(null);
-
-
     try {
-      // 2. TODO: Await the service call using firstValueFrom
-      // Hint: const response = await firstValueFrom(this.clientService.getClients(poissonnerieId, page));
-      const response = await firstValueFrom(this.clientService.getClients(poissonnerieId, page));
-
-      // 3. TODO: Update the _clientsPage signal with response.data
+      const response = await firstValueFrom(this.clientService.getClients(poissonnerieId, page, size));
       this._clientsPage.set(response.data);
-
-
     } catch (err) {
-      // 4. TODO: Set the error signal to a message
       this._error.set('Erreur lors du chargement des clients. Veuillez réessayer.');
-
     } finally {
-      // 5. TODO: Set isLoading to false
       this._isLoading.set(false);
     }
   }
@@ -105,9 +95,9 @@ export class ClientStore {
 
     try {
       await firstValueFrom(this.clientService.createClient(data));
-
-      //reload the first page of clients to see the new one!
       await this.loadClients(data.poissonnerieId, 0);
+      this.toastService.success('Client créé avec succès !');
+
     } catch (err){
       this._error.set('Erreur lors de la création du client. Veuillez réessayer.');
     } finally {
@@ -142,7 +132,7 @@ export class ClientStore {
           break;
       }
       await this.loadClientDetail(client.id);
-
+      this.toastService.success('Transaction enregistrée avec succès !');
     }catch (err){
       this._error.set('Erreur lors de la transaction. Veuillez réessayer.');
       throw err;
@@ -160,6 +150,7 @@ export class ClientStore {
     try {
       await firstValueFrom(this.clientService.createCompteCourant(client.id));
       await this.loadClientDetail(client.id); // Refresh the page!
+      this.toastService.success('Compte courant ouvert avec succès !');
     } catch (err) {
       console.error(err);
     } finally {
@@ -174,6 +165,7 @@ export class ClientStore {
     try {
       await firstValueFrom(this.clientService.createEpargne(client.id));
       await this.loadClientDetail(client.id); // Refresh the page!
+      this.toastService.success('Compte épargne ouvert avec succès !');
     } catch (err) {
       console.error(err);
     } finally {
@@ -193,6 +185,7 @@ export class ClientStore {
           compteCourantId: client.compteCourantId,
           nouvelleLimite: nouvelleLimite
         }));
+        this.toastService.success('Limite de crédit modifiée !');
       } finally {
         this._isLoading.set(false);
       }
@@ -211,6 +204,7 @@ export class ClientStore {
         // We assume all clients on the page belong to the same poissonnerie
         const poissonnerieId = currentPage.content[0].poissonnerie.id;
         await this.loadClients(poissonnerieId, currentPage.number);
+        this.toastService.success('Client désactivé avec succès !');
       }
     } catch (err){
       this._error.set('Erreur lors de la désactivation du client.');
@@ -231,6 +225,7 @@ export class ClientStore {
       if (currentPage && currentPage.content.length > 0) {
         const poissonnerieId = currentPage.content[0].poissonnerie.id;
         await this.loadClients(poissonnerieId, currentPage.number);
+        this.toastService.success('Client modifié avec succès !');
       }
     } catch (err){
       this._error.set('Erreur lors de la mise à jour du client.');
@@ -280,6 +275,7 @@ export class ClientStore {
         } else {
           await this.loadClients(poissonnerieId, currentPage.number);
         }
+         this.toastService.success('Client réactivé avec succès !');
       }
     } catch (err) {
       this._error.set('Erreur lors de la réactivation du client.');

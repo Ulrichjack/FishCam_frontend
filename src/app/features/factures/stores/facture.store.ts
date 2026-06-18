@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from "@angular/core";
 import { AchatJournalierService } from "../services/achat-journalier.service";
 import { FactureResponse } from "../../../core/models/facture.model";
 import { firstValueFrom } from "rxjs";
+import { ToastService } from "../../../core/services/toast.service";
 
 
 
@@ -11,6 +12,7 @@ import { firstValueFrom } from "rxjs";
 export class FactureStore {
 
   private readonly achatService = inject(AchatJournalierService);
+  private readonly toastService = inject(ToastService);
 
   private readonly _factures = signal<FactureResponse[]>([]);
   private readonly _isLoading = signal<boolean>(false);
@@ -42,7 +44,7 @@ export class FactureStore {
     try {
       await firstValueFrom(this.achatService.cloturerFacture(factureId));
       this._factures.update(list => list.map(f => f.id === factureId ? { ...f, cloture: true } : f));
-      
+      this.toastService.success('Facture clôturée avec succès !');
     } catch (error) {
       this._error.set('Erreur lors de la clôture de la facture');
     } finally {

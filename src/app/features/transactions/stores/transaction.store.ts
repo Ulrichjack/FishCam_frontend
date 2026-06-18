@@ -42,8 +42,8 @@ export class TransactionStore {
      try{ 
        const result = await firstValueFrom(this.transactionService.getTransactions(poissonnerieId, page, size, type, searchTerm, date));
         this._transactions.set(result.data.content);
-        this._totalElements.set(result.data.totalElements);
-        this._totalPages.set(result.data.totalPages);
+        this._totalElements.set(result.data?.page?.totalElements ?? result.data.totalElements ?? 0);
+        this._totalPages.set(result.data?.page?.totalPages ?? result.data.totalPages ?? 0);
      } catch (error) {
        this._error.set('Failed to load transactions');
      } finally {

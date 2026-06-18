@@ -1,4 +1,4 @@
-import { PoissonnerieResponse } from "./PoissonnerieResponse.model";
+import { PoissonnerieResponse } from "./poissonnerie-response.model";
 
 export interface NotificationResponse
 {

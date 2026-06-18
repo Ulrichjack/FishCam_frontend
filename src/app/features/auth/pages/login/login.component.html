@@ -49,7 +49,7 @@
       }
 
       <!-- Formulaire -->
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate class="space-y-4">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate autocomplete="off" class="space-y-4">
 
         <!-- Téléphone -->
         <div class="fc-field-group">
@@ -98,12 +98,12 @@
 
               <!-- Input AND Button Wrapper -->
               <div class="flex flex-1 items-center pr-2">
-
+                
                 <input [type]="isPasswordVisible() ? 'text' : 'password'"
                       id="password"
                       formControlName="password"
                       placeholder="••••••••"
-                      autocomplete="current-password"
+                      autocomplete="new-password"
                       class="fc-input" />
 
                 <button type="button"

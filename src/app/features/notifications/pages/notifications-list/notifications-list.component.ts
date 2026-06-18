@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { NotificationStore } from '../../stores/notification.store';
@@ -20,15 +20,19 @@ export class NotificationsListComponent implements OnInit {
   // Expose l'enum au template HTML
   readonly TypeNotification = TypeNotification;
 
-  // --- COMPUTED POUR LA PAGINATION (Évite les erreurs "undefined" dans le HTML) ---
-  readonly currentPage = computed(() => this.notificationStore.page()?.number ?? 0);
-  readonly totalPages = computed(() => this.notificationStore.page()?.totalPages ?? 0);
+  isLoading = signal(false);
 
-  ngOnInit() {
+
+  // --- COMPUTED POUR LA PAGINATION (Évite les erreurs "undefined" dans le HTML) ---
+  // CORRECTION ICI 👇
+  readonly currentPage = computed(() => this.notificationStore.page()?.page?.number ?? this.notificationStore.page()?.number ?? 0);
+  readonly totalPages = computed(() => this.notificationStore.page()?.page?.totalPages ?? this.notificationStore.page()?.totalPages ?? 0);
+  async ngOnInit() {
     const userId = this.authStore.user()?.id;
-    const pId = this.authStore.activePoissonnerieId();
-    if (userId && pId) {
-      this.notificationStore.loadPage(userId, pId, 0);
+    if (userId) {
+      this.isLoading.set(true);
+      await this.notificationStore.loadPage(userId, 0);
+      this.isLoading.set(false);
     }
   }
 
@@ -65,4 +69,9 @@ export class NotificationsListComponent implements OnInit {
       this.notificationStore.loadPage(userId, this.currentPage() + 1);
     }
   }
+
+  
+  
+
+
 }

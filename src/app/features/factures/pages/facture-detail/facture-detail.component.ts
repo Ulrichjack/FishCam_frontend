@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { DatePipe, } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { firstValueFrom } from 'rxjs';
 import { AchatJournalierService } from '../../services/achat-journalier.service';
@@ -10,13 +10,21 @@ import { FactureDetailResponse } from '../../../../core/models/facture.model';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LigneFormComponent } from '../../../../shared/components/ligne-form/ligne-form.component';
 import { CurrencyFcfaPipe } from '../../../../shared/pipes/currency-fcfa.pipe';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { LivreurService } from '../../../livreurs/services/livreur.service';
+import { EvaluationService } from '../../../livreurs/services/evaluation.service';
+import { StarRatingComponent } from '../../../../shared/components/star-rating/star-rating.component';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
+import { EvaluationLivreurResponse } from '../../../../core/models/evaluation.model';
+import { CreateEvaluationRequest } from '../../../livreurs/models/evaluation-request.model';
 
 @Component({
   selector: 'app-facture-detail',
   standalone: true,
   imports: [
-    RouterLink, DatePipe, 
-    LucideAngularModule, ConfirmDialogComponent, LigneFormComponent,CurrencyFcfaPipe
+    RouterLink, DatePipe,  ReactiveFormsModule,
+    LucideAngularModule, ConfirmDialogComponent, LigneFormComponent, CurrencyFcfaPipe,
+    StarRatingComponent, ModalComponent
   ],
   templateUrl: './facture-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -26,25 +34,36 @@ export class FactureDetailComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly achatService = inject(AchatJournalierService);
   public readonly authStore = inject(AuthStore);
+  private readonly fb = inject(FormBuilder);
+  private readonly livreurService = inject(LivreurService);
+  private readonly evaluationService = inject(EvaluationService);
 
-  // DIRECTIVE: Transforme les paramètres de la route en signal pour récupérer l'ID
   private readonly paramMap = toSignal(this.route.paramMap);
 
-  // --- SIGNAUX D'ÉTAT ---
   facture = signal<FactureDetailResponse | null>(null);
+  evaluation = signal<EvaluationLivreurResponse | null>(null); // <-- SIGNAL POUR L'ÉVALUATION
+  
+  // Computed pour savoir si on a déjà évalué
+  hasEvaluation = computed(() => this.evaluation() !== null);
+
   isLoading = signal(false);
   error = signal<string | null>(null);
   isConfirmOpen = signal(false);
   showAddForm = signal(false);
   isDeleteConfirmOpen = signal(false);
   ligneToDelete = signal<number | null>(null);
-  
-  // YOUR CODE HERE (Signaux)
+  isEvalModalOpen = signal(false);
+  livreurs = signal<any[]>([]);
+
+  evalForm = this.fb.group({
+    livreurId: [null, Validators.required],
+    qualiteProduit: [null, [Validators.required, Validators.min(1), Validators.max(5)]],
+    respectPoids: [null, [Validators.required, Validators.min(1), Validators.max(5)]],
+    problemeSignale: [false],
+    commentaire: ['']
+  });
 
   constructor() {
-    // DIRECTIVE: Utilise un effect() pour écouter les changements de paramMap().
-    // Si un paramètre 'id' est présent, appelle this.loadFacture(Number(id)).
-    // YOUR CODE HERE
     effect(() => {
       const idParam = this.paramMap()?.get('id');
       if (idParam) {
@@ -54,12 +73,18 @@ export class FactureDetailComponent {
   }
 
   async loadFacture(id: number) {
-    // YOUR CODE HERE
     this.isLoading.set(true);
     this.error.set(null);
     try {
-       const response = await firstValueFrom(this.achatService.getFactureDetail(id));
-      this.facture.set(response.data);
+      // CHARGEMENT EN PARALLÈLE DE LA FACTURE ET DE L'ÉVALUATION
+      const [factureRes, evalRes] = await Promise.all([
+        firstValueFrom(this.achatService.getFactureDetail(id)),
+        firstValueFrom(this.evaluationService.getEvaluationByFacture(id))
+      ]);
+      
+      this.facture.set(factureRes.data);
+      this.evaluation.set(evalRes.data); // Sera null si pas d'évaluation
+      
     } catch (err) {
       this.error.set('Erreur lors du chargement de la facture');
     } finally {
@@ -67,15 +92,11 @@ export class FactureDetailComponent {
     }
   }
 
-  // DIRECTIVE: Implémente openCloseDialog() qui ouvre la modale de confirmation
   openCloseDialog() {
-    // YOUR CODE HERE
     this.isConfirmOpen.set(true);
   }
 
- 
   async executeClose() {
-    // YOUR CODE HERE
     const factureId = this.facture()?.id;
     if (!factureId) return;
 
@@ -89,7 +110,6 @@ export class FactureDetailComponent {
     }
   }
 
-  
   async downloadPdf() {
     const fact = this.facture();
     if (!fact) return;
@@ -98,15 +118,12 @@ export class FactureDetailComponent {
       const blob = await firstValueFrom(this.achatService.downloadFacturePdf(fact.id));
       const url = window.URL.createObjectURL(blob);
       
-      // 1. Nettoyer le nom du fournisseur (remplacer espaces par des tirets)
       const cleanFournisseur = fact.fournisseurNom.replace(/[^a-zA-Z0-9]/g, '_');
-      
-      // 2. Créer le beau nom de fichier
       const beauNom = `Facture_${cleanFournisseur}_${fact.dateAchat}.pdf`;
       
       const a = document.createElement('a');
       a.href = url;
-      a.download = beauNom; // ✅ On utilise le beau nom ici !
+      a.download = beauNom;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -124,7 +141,7 @@ export class FactureDetailComponent {
     this.isLoading.set(true);
     try {
       await firstValueFrom(this.achatService.addLigne(factureId, ligneData));
-      await this.loadFacture(factureId); // Recharge la facture pour voir la nouvelle ligne
+      await this.loadFacture(factureId); 
     } catch (err) {
       this.error.set("Erreur lors de l'ajout de la ligne");
       this.isLoading.set(false);
@@ -136,7 +153,6 @@ export class FactureDetailComponent {
     this.isDeleteConfirmOpen.set(true);
   }
 
-  // 3. ADD THIS NEW METHOD:
   async executeDeleteLigne() {
     const factureId = this.facture()?.id;
     const ligneId = this.ligneToDelete();
@@ -154,11 +170,60 @@ export class FactureDetailComponent {
       this.isLoading.set(false);
     }
   }
-  
 
   getTotalPoids(lignes: any[] | undefined): number {
     if (!lignes) return 0;
     return lignes.reduce((sum, ligne) => sum + ligne.poidsKg, 0);
   }
 
+  openEvaluationModal() {
+    this.isEvalModalOpen.set(true);
+    this.evalForm.reset();
+    this.livreurService.getAll().subscribe({
+      next: (response) => {
+        this.livreurs.set(response.data);
+      },
+      error: () => {
+        this.error.set("Erreur lors du chargement des livreurs");
+      }
+    });
+  }
+
+  async submitEvaluation() {
+    if (this.evalForm.invalid) {
+      this.error.set("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+
+    const formValue = this.evalForm.value;
+    
+    if (!formValue.qualiteProduit || formValue.qualiteProduit < 1 || 
+        !formValue.respectPoids || formValue.respectPoids < 1) {
+      this.error.set("Veuillez donner une note d'au moins 1 étoile.");
+      return;
+    }
+
+    const factureId = this.facture()?.id;
+    if (!factureId) return;
+
+    const evalData: CreateEvaluationRequest = {
+      achatJournalierId: factureId,
+      livreurId: formValue.livreurId!,
+      qualiteProduit: formValue.qualiteProduit!,
+      respectPoids: formValue.respectPoids!,
+      problemeSignale: formValue.problemeSignale ?? false,
+      commentaire: formValue.commentaire ?? undefined
+    };
+
+    this.isLoading.set(true);
+    try {
+      const response = await firstValueFrom(this.evaluationService.submitEvaluation(evalData));
+      this.evaluation.set(response.data); // On met à jour le signal avec la nouvelle évaluation !
+      this.isEvalModalOpen.set(false);
+    } catch (err: any) {
+      this.error.set(err.error?.message || "Erreur lors de la soumission de l'évaluation");
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
 }

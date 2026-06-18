@@ -6,7 +6,7 @@ import { NotificationStore } from '../../features/notifications/stores/notificat
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PoissonnerieService } from '../../features/admin/services/poissonnerie.service';
-import { PoissonnerieResponse } from '../../core/models/PoissonnerieResponse.model';
+import { PoissonnerieResponse } from '../../core/models/poissonnerie-response.model';
 
 @Component({
   selector: 'app-topbar',

@@ -7,10 +7,11 @@ export interface UserResponse {
   scope: UserScope; 
   poissonnerieId: number | null; 
   poissonnerieName: string | null;
+  active:boolean;
 }
 
 
 export enum UserScope { 
   MULTI_POISSONNERIE = 'MULTI_POISSONNERIE',
-  SINGLE_POISSONNERIE = 'SINGLE_POISSONNERIE'
+  //SINGLE_POISSONNERIE = 'SINGLE_POISSONNERIE'
 }

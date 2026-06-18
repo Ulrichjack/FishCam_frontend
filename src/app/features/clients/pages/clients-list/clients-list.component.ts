@@ -1,18 +1,25 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { ClientStore } from '../../stores/client.store';
 import { AuthStore } from '../../../../core/stores/auth.store';
-import { LucideAngularModule } from 'lucide-angular';
+import { Form, LucideAngularModule } from 'lucide-angular';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 import { SlideOverPanelComponent } from '../../../../shared/components/slide-over-panel/slide-over-panel.component';
 import { ClientFormComponent } from "../../components/client-form/client-form.component";
 import { RouterLink } from '@angular/router';
 import { ClientResponse } from '../../../../core/models/compte-courant.model';
 import { ConfirmDialogComponent } from "../../../../shared/components/confirm-dialog/confirm-dialog.component";
+import { FormsModule } from '@angular/forms';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
+import { ErrorStateComponent } from '../../../../shared/components/error-state/error-state.component';
 
 @Component({
   selector: 'app-clients-list',
   standalone: true,
-  imports: [LucideAngularModule, StatusBadgeComponent, SlideOverPanelComponent, ClientFormComponent, RouterLink, ConfirmDialogComponent],
+  imports: [LucideAngularModule, StatusBadgeComponent, 
+    SlideOverPanelComponent, ClientFormComponent, 
+    RouterLink, ConfirmDialogComponent,FormsModule,
+    LoadingSkeletonComponent, EmptyStateComponent, ErrorStateComponent ],
   templateUrl: './clients-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -22,10 +29,12 @@ export class ClientsListComponent implements OnInit {
   readonly clientStore = inject(ClientStore);
   readonly authStore = inject(AuthStore);
 
+
   isSlideOverOpen = signal<boolean>(false);
   isConfirmOpen = signal<boolean>(false);
   clientToDelete = signal<ClientResponse | null>(null);
   clientToEdit = signal<ClientResponse | null>(null);
+  pageSize = signal<number>(20);
 
   private searchTimeout: any;
 
@@ -128,29 +137,36 @@ export class ClientsListComponent implements OnInit {
     }
   }
 
+  onPageSizeChange(newSize: string) {
+  this.pageSize.set(Number(newSize));
+  const poissonnerieId = this.authStore.activePoissonnerieId();
+  if (poissonnerieId) {
+    // On recharge la page 0 avec la nouvelle taille
+    this.clientStore.loadClients(poissonnerieId, 0, this.pageSize());
+  }
+}
+
 
 
   previousPage(): void {
-    const pId = this.authStore.user()?.poissonnerieId;
-    const currentPage = this.clientStore.clientsPage()?.number || 0;
+    const pId = this.authStore.activePoissonnerieId();
+    const currentPage = this.clientStore.clientsPage()?.page?.number ?? this.clientStore.clientsPage()?.number ?? 0;
     
     if (pId) {
-      this.clientStore.loadClients(pId, currentPage - 1);
-    } else {
-      console.error('Erreur : Aucun ID de poissonnerie trouvé.');
+      this.clientStore.loadClients(pId, currentPage - 1, this.pageSize());
     }
   }
 
   nextPage(): void {
-    const pId = this.authStore.user()?.poissonnerieId;
-    const currentPage = this.clientStore.clientsPage()?.number || 0;
+    const pId = this.authStore.activePoissonnerieId();
+    const currentPage = this.clientStore.clientsPage()?.page?.number ?? this.clientStore.clientsPage()?.number ?? 0;
     
     if (pId) {
-      this.clientStore.loadClients(pId, currentPage + 1);
-    } else {
-      console.error('Erreur : Aucun ID de poissonnerie trouvé.');
+      this.clientStore.loadClients(pId, currentPage + 1, this.pageSize());
     }
   }
+
+  
 
 
 

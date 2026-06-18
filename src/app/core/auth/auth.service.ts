@@ -24,5 +24,9 @@ export class AuthService {
     );
   }
 
+  changePassword(data: { ancienMotDePasse: string, nouveauMotDePasse: string }) {
+    return this.http.put<ApiResponse<string>>(`${this.apiUrl}/change-password`, data);
+  }
+
 
 }

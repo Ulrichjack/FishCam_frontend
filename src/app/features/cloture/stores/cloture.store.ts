@@ -4,10 +4,12 @@ import { inject, Injectable, signal } from "@angular/core";
 import { ClotureService } from "../services/cloture.service";
 import { firstValueFrom } from "rxjs";
 import { ClotureJournaliereRequest, ClotureJournaliereResponse, PreparationClotureResponse } from "../../../core/models/cloture.model";
+import { ToastService } from "../../../core/services/toast.service";
 
 @Injectable({ providedIn: 'root' })
 export class ClotureStore {
   private readonly clotureService = inject(ClotureService);
+  private readonly toastService = inject(ToastService);
 
   // --- STATE SIGNALS ---
   private _preparation = signal<PreparationClotureResponse | null>(null);
@@ -50,6 +52,7 @@ export class ClotureStore {
       // Après la clôture, on recharge juste l'historique manuellement
       const histRes = await firstValueFrom(this.clotureService.getHistorique(request.poissonnerieId));
       this._historique.set(histRes.data);
+      this.toastService.success('Journée clôturée avec succès !');
     } catch (error: any) {
       this._error.set(error.message || 'Erreur lors de la clôture.');
       throw error; // Important de jeter l'erreur pour ne pas fermer la modale si ça plante

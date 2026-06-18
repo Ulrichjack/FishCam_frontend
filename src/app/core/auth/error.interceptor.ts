@@ -3,11 +3,12 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AuthStore } from '../stores/auth.store';
+import { ToastService } from '../services/toast.service'; // <-- AJOUT
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-
    const authStore = inject(AuthStore);
    const router = inject(Router);
+   const toastService = inject(ToastService); // <-- AJOUT
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -15,31 +16,30 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       switch (error.status) {
         case 401:
-          message = 'Session expirée';
+          message = 'Session expirée, veuillez vous reconnecter.';
           authStore.logout();
           router.navigate(['/login']);
           break;
         case 403:
-          message = 'Accès refusé (403)';
+          message = 'Accès refusé. Vous n\'avez pas les droits.';
           break;
         case 404:
-          message = 'Serveur introuvable (404)';
+          message = 'Ressource introuvable (404).';
           break;
         case 400:
-                  case 409:
-                  case 422:
-                      // On récupère le message spécifique envoyé par ton backend
-                      message = error.error?.message || error.message || error.error || "Données invalides ou déjà existantes";
-                      break;
+        case 409:
+        case 422:
+          message = error.error?.message || error.message || "Données invalides.";
+          break;
         case 500:
-          message = 'Erreur serveur (500)';
+          message = 'Erreur serveur (500). Réessayez plus tard.';
           break;
         case 0:
-          message = 'Erreur réseau (Vérifiez votre connexion)';
+          message = 'Connexion impossible au serveur.';
           break;
       }
 
-      console.error(`[Erreur ${error.status}]:`, message);
+      toastService.error(message); // <-- AFFICHE LE TOAST D'ERREUR !
       return throwError(() => error);
     })
   );

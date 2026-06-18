@@ -26,7 +26,14 @@ export const routes: Routes = [
       { path: 'bilans', loadComponent: () => import('./features/bilans/pages/bilans-page/bilans-page.component').then(m => m.BilansPageComponent) },
       { path: 'statistiques', loadComponent: () => import('./features/bilans/pages/statistiques-page/statistiques-page.component').then(m => m.StatistiquesPageComponent) },
       { path: 'notifications', loadComponent: () => import('./features/notifications/pages/notifications-list/notifications-list.component').then(m => m.NotificationsListComponent) },
-
+      { path: 'produits', loadComponent: () => import('./features/produits/pages/produits-list/produits-list.component').then(m => m.ProduitsListComponent)},
+      { path: 'fournisseurs', loadComponent: () => import('./features/fournisseurs/pages/fournisseurs-list/fournisseurs-list.component').then(m => m.FournisseursListComponent)},
+      { path: 'livreurs', loadComponent: () => import('./features/livreurs/pages/livreurs-list/livreurs-list.component').then(m => m.LivreursListComponent)},
+      { path: 'poissonneries', loadComponent: () => import('./features/admin/pages/poissonneries-list/poissonneries-list.component').then(m => m.PoissonneriesListComponent) },
+      { path: 'equipe', loadComponent: () => import('./features/admin/pages/equipe-list/equipe-list.component').then(m => m.EquipeListComponent) },
+      { path: 'recapitulatifs', loadComponent: () => import('./features/bilans/pages/recapitulatif-page/recapitulatif-page.component').then(m => m.RecapitulatifPageComponent) },
+      { path: 'audit', loadComponent: () => import('./features/admin/pages/audit-list/audit-list.component').then(m => m.AuditListComponent) },
+      { path: 'backup', loadComponent: () => import('./features/admin/pages/backup-page/backup-page.component').then(m => m.BackupPageComponent) },
     ]
    },
 

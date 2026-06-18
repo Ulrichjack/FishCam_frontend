@@ -8,6 +8,9 @@ import { LucideAngularModule } from 'lucide-angular';
 import { TransactionFormComponent } from '../../../../shared/components/transaction-form/transaction-form.component';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 import { CompteCourantResponse } from '../../../../core/models/compte-courant.model';
+import { ErrorStateComponent } from '../../../../shared/components/error-state/error-state.component';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
 
 
 @Component({
@@ -16,8 +19,11 @@ import { CompteCourantResponse } from '../../../../core/models/compte-courant.mo
   imports: [
     DebtorCardComponent, 
     LucideAngularModule,
-    TransactionFormComponent, // <-- AJOUTÉ ICI
-    ModalComponent            // <-- AJOUTÉ ICI
+    TransactionFormComponent,
+    ModalComponent,
+    LoadingSkeletonComponent,
+    EmptyStateComponent,
+    ErrorStateComponent           
   ],
   templateUrl: './dettes-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -25,7 +31,7 @@ import { CompteCourantResponse } from '../../../../core/models/compte-courant.mo
 export class DettesListComponent implements OnInit {
   
    readonly store = inject(DettesStore);
-  private readonly authStore = inject(AuthStore);
+   readonly authStore = inject(AuthStore);
 
   readonly isModalOpen = signal(false);
   readonly selectedCompte = signal<CompteCourantResponse | null>(null);

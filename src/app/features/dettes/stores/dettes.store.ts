@@ -3,11 +3,13 @@ import { DashboardService } from "../../dashboard/services/dashboard.service";
 import { CompteCourantResponse } from "../../../core/models/compte-courant.model";
 import { firstValueFrom } from "rxjs";
 import { ClientService } from "../../clients/services/client.service";
+import { ToastService } from "../../../core/services/toast.service";
 
 @Injectable({ providedIn: 'root' })
 export class DettesStore {
   private readonly dashboardService = inject(DashboardService);
-  private readonly clientService = inject(ClientService); // <-- INJECT
+  private readonly clientService = inject(ClientService); 
+  private readonly toastService = inject(ToastService);
 
   // --- STATE SIGNALS ---
   private readonly _debtors = signal<CompteCourantResponse[]>([]);
@@ -45,6 +47,7 @@ export class DettesStore {
       }));
       // 2. On recharge la liste pour mettre à jour les cartes
       await this.loadDebtors(poissonnerieId);
+      this.toastService.success('Remboursement enregistré avec succès !');
     } catch (error) {
       console.error("Erreur lors du remboursement", error);
       throw error; // On renvoie l'erreur au composant pour qu'il affiche un message si besoin

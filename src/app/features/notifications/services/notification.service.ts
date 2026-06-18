@@ -10,8 +10,9 @@ export class NotificationService {
   private readonly baseUrl = `${environment.apiUrl}/notifications`;
 
   getNotificationsPage(userId: number, page = 0, size = 20) {
+    const safeSize = size > 0 ? size : 20;
     return this.http.get<ApiResponse<PageResponse<NotificationResponse>>>(
-      `${this.baseUrl}/user/${userId}/page?page=${page}&size=${size}`
+      `${this.baseUrl}/user/${userId}/page?page=${page}&size=${safeSize}`
     );
   }
 

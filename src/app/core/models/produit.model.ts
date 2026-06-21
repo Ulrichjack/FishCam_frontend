@@ -4,4 +4,6 @@ export interface ProduitResponse {
   unite: string;
   poidsParCarton: number;
   actif: boolean;
+  prixUnitaireCarton?: number; // NOUVEAU
+  dernierPrixVenteKilo?: number; // NOUVEAU
 }

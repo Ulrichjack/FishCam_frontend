@@ -31,12 +31,16 @@ export class BilanStore {
     this._isLoading.set(true);
     this._error.set(null);
     this._bilan.set(null);
-    
+
     try {
       const response = await firstValueFrom(this.bilanService.getBilanMensuel(poissonnerieId, mois, annee));
       this._bilan.set(response.data);
     } catch (error: any) {
-      this._error.set(error.message || 'An error occurred while loading the bilan.');
+       if (error.status === 400) {
+        this._error.set("Aucune donnée financière n'est disponible pour ce mois.");
+      } else {
+        this._error.set(error.error?.message || 'Une erreur est survenue lors du chargement du bilan.');
+      }
     } finally {
       this._isLoading.set(false);
     }
@@ -52,7 +56,7 @@ export class BilanStore {
     this._isLoading.set(true);
     this._error.set(null);
     this._comparaison.set(null);
-    
+
     try {
       const response = await firstValueFrom(this.bilanService.compareBoutiques(mois, annee));
       this._comparaison.set(response.data);

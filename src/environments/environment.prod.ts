@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl:'http://local:8080/api/v1'
-}
+  apiUrl: '/api/v1' // <-- Chemin relatif ! Plus de localhost.
+};

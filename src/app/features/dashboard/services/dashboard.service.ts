@@ -12,7 +12,9 @@ import { CompteCourantResponse } from '../../../core/models/compte-courant.model
 export class DashboardService {
 
   private readonly http = inject(HttpClient);
-  //private readonly apiUrl = `${environment.apiUrl}/statistiques`;
+  private readonly apiUrl = `${environment.apiUrl}/statistiques`;
+  private readonly ccUrl = `${environment.apiUrl}/comptes-courants`;
+  private readonly fUrl = `${environment.apiUrl}/factures`;
 
   // TODO: Create a method called 'getStats' that takes a 'poissonnerieId: number' as a parameter.
   // It should return a GET request to: /poissonneries/{poissonnerieId}/dashboard
@@ -20,16 +22,16 @@ export class DashboardService {
 
   // Write your code here:
   getStats(poissonnerieId: number) {
-    return this.http.get<ApiResponse<StatistiquesPoissonnerieResponse>>(`${environment.apiUrl}/statistiques/poissonneries/${poissonnerieId}/dashboard`);
+    return this.http.get<ApiResponse<StatistiquesPoissonnerieResponse>>(`${this.apiUrl}/poissonneries/${poissonnerieId}/dashboard`);
   }
 
   getDebtors(poissonnerieId: number) {
-    return this.http.get<ApiResponse<CompteCourantResponse[]>>(`${environment.apiUrl}/comptes-courants/poissonnerie/${poissonnerieId}/en-dette`);
+    return this.http.get<ApiResponse<CompteCourantResponse[]>>(`${this.ccUrl}/poissonnerie/${poissonnerieId}/en-dette`);
   }
 
 
   getFacturesDuJour(poissonnerieId: number, date: string) {
-    return this.http.get<ApiResponse<FactureResponse[]>>(`${environment.apiUrl}/factures?poissonnerieId=${poissonnerieId}&date=${date}`);
+    return this.http.get<ApiResponse<FactureResponse[]>>(`${this.fUrl}?poissonnerieId=${poissonnerieId}&date=${date}`);
   }
 
 

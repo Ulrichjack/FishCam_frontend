@@ -19,5 +19,5 @@ export class ProduitService {
     return this.http.get<ApiResponse<ProduitResponse[]>>(`${this.apiUrl}/search?q=${query}`)
       .pipe(map(res => res.data));
   }
-  
+
 }

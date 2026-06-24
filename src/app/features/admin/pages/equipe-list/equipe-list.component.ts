@@ -52,8 +52,12 @@ export class EquipeListComponent implements OnInit {
   }
 
   openCreatePanel() {
-    this.userToEdit.set(null);
-    this.isSlideOverOpen.set(true);
+    // On force un changement d'état pour déclencher l'effect du formulaire
+    this.userToEdit.set({ id: -1 } as any); // Hack temporaire pour forcer le changement
+    setTimeout(() => {
+      this.userToEdit.set(null); // Le vrai reset
+      this.isSlideOverOpen.set(true);
+    }, 0);
   }
 
   openEditPanel(user: UserResponse) {

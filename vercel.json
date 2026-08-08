@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/v1/:path*",
-      "destination": "https://TODO-remplacer-par-url-render.onrender.com/api/v1/:path*"
+      "destination": "https://fishcam-backend.onrender.com/api/v1/:path*"
     }
   ]
 }

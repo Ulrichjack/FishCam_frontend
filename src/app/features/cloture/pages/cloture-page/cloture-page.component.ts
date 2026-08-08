@@ -83,9 +83,18 @@ export class CloturePageComponent implements OnInit {
 
   // Ajoute ceci juste en dessous de "readonly ecart = computed(...)"
   readonly isAlreadyClosed = computed(() => {
-    const date = this.selectedDate(); // ex: "2026-05-08"
-    return this.store.historique().some(h => h.date.startsWith(date));
+    const date = this.selectedDate();
+    const page = this.store.historiquePage();
+    if (!page || !page.content) return false;
+    return page.content.some(h => h.date.startsWith(date));
   });
+
+  onPageChange(page: number) {
+    const poissonnerieId = this.authStore.activePoissonnerieId();
+    if (poissonnerieId) {
+      this.store.loadPageData(poissonnerieId, this.selectedDate(), page);
+    }
+  }
 
   constructor() {
     // DIRECTIVE: 4. Use an effect to auto-fill "fondDeCaisse" when store.preparation() loads
@@ -127,10 +136,6 @@ export class CloturePageComponent implements OnInit {
   async submitCloture() {
     const poissonnerieId = this.authStore.activePoissonnerieId();
     if (!poissonnerieId || this.clotureForm.invalid) return;
-
-    // DIRECTIVE: 5. Call this.store.submitCloture(...) with the form values + date + poissonnerieId
-    // Then close the confirm dialog and reset the form (keep fondDeCaisse)
-    // YOUR CODE HERE
     const formValues = this.clotureForm.value;
     const request = {
       poissonnerieId,

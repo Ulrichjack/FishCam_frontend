@@ -52,7 +52,7 @@
         <h3 class="text-lg font-bold text-gray-900 mb-4">Ajouter un produit</h3>
         
         <!-- DIRECTIVE: Call app-ligne-form here -->
-        @if (authStore.user()?.poissonnerieId; as pId) {
+        @if (authStore.activePoissonnerieId(); as pId) {
           <app-ligne-form 
             [poissonnerieId]="pId" 
             (ligneAdded)="onLigneAdded($event)">

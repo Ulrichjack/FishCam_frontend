@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
@@ -17,6 +17,7 @@ import { StarRatingComponent } from '../../../../shared/components/star-rating/s
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 import { EvaluationLivreurResponse } from '../../../../core/models/evaluation.model';
 import { CreateEvaluationRequest } from '../../../livreurs/models/evaluation-request.model';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-facture-detail',
@@ -44,6 +45,8 @@ export class FactureDetailComponent {
   private readonly fb = inject(FormBuilder);
   private readonly livreurService = inject(LivreurService);
   private readonly evaluationService = inject(EvaluationService);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   private readonly paramMap = toSignal(this.route.paramMap);
 
@@ -60,7 +63,13 @@ export class FactureDetailComponent {
   isDeleteConfirmOpen = signal(false);
   ligneToDelete = signal<number | null>(null);
   isEvalModalOpen = signal(false);
+  isEditingDate = signal(false);
+  isFactureDeleteConfirmOpen = signal(false);
   livreurs = signal<any[]>([]);
+
+  dateForm = this.fb.group({
+    dateAchat: ['', Validators.required]
+  });
 
   evalForm = this.fb.group({
     livreurId: [null, Validators.required],
@@ -90,6 +99,7 @@ export class FactureDetailComponent {
       ]);
       
       this.facture.set(factureRes.data);
+      this.dateForm.patchValue({ dateAchat: factureRes.data.dateAchat });
       this.evaluation.set(evalRes.data); // Sera null si pas d'évaluation
       
     } catch (err) {
@@ -174,6 +184,48 @@ export class FactureDetailComponent {
     } finally {
       this.isDeleteConfirmOpen.set(false);
       this.ligneToDelete.set(null);
+      this.isLoading.set(false);
+    }
+  }
+
+  startDateEdit() {
+    const fact = this.facture();
+    if (!fact) return;
+    this.dateForm.patchValue({ dateAchat: fact.dateAchat });
+    this.isEditingDate.set(true);
+  }
+
+  async saveDate() {
+    const factureId = this.facture()?.id;
+    const dateAchat = this.dateForm.value.dateAchat;
+    if (!factureId || !dateAchat || this.dateForm.invalid) return;
+
+    this.isLoading.set(true);
+    this.error.set(null);
+    try {
+      await firstValueFrom(this.achatService.updateFactureDate(factureId, dateAchat));
+      await this.loadFacture(factureId);
+      this.isEditingDate.set(false);
+      this.toastService.success('Date de la facture modifiée avec succès !');
+    } catch (err: any) {
+      this.error.set(err.error?.message || 'Impossible de modifier la date de la facture');
+      this.isLoading.set(false);
+    }
+  }
+
+  async executeDeleteFacture() {
+    const factureId = this.facture()?.id;
+    if (!factureId) return;
+
+    this.isLoading.set(true);
+    this.error.set(null);
+    try {
+      await firstValueFrom(this.achatService.deleteFacture(factureId));
+      this.toastService.success('Facture supprimée avec succès !');
+      await this.router.navigate(['/factures']);
+    } catch (err: any) {
+      this.error.set(err.error?.message || 'Impossible de supprimer la facture');
+      this.isFactureDeleteConfirmOpen.set(false);
       this.isLoading.set(false);
     }
   }

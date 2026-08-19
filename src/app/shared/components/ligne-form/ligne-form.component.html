@@ -7,6 +7,12 @@
     <app-product-autocomplete 
       (productSelected)="onProductSelected($event)">
     </app-product-autocomplete>
+    @if (isLoadingPrix()) {
+      <div class="mt-2 flex items-center gap-2 text-xs font-medium text-fc-green" role="status">
+        <lucide-icon name="loader-circle" class="h-3.5 w-3.5 animate-spin"></lucide-icon>
+        Chargement des derniers prix de cette boutique…
+      </div>
+    }
   </div>
 
   <!-- Ligne 2 : Quantité et Poids -->
@@ -27,10 +33,6 @@
       <label class="block text-sm font-medium text-gray-700 mb-1">Prix Achat / Carton *</label>
       <input type="number" formControlName="prixUnitaireCarton" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none">
       
-      @if (isLoadingPrix()) {
-        <lucide-icon name="loader-circle" class="absolute right-3 top-9 h-4 w-4 text-fc-green animate-spin"></lucide-icon>
-      }
-
       <!-- THE MISSING BADGE IS HERE -->
       @if (dernierPrix(); as dp) {
         <div class="mt-1 text-xs font-medium flex items-center gap-1">
@@ -50,16 +52,19 @@
     <div class="relative">
       <label class="block text-sm font-medium text-gray-700 mb-1">Prix Vente / Kg *</label>
       <input type="number" formControlName="prixVenteKilo" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none">
-      @if (isLoadingPrix()) {
-        <lucide-icon name="loader-circle" class="absolute right-3 top-9 h-4 w-4 text-fc-green animate-spin"></lucide-icon>
-      }
     </div>
   </div>
 
   <!-- Total Calculé (UI Only) -->
-  <div class="flex items-center justify-between pt-2 border-t border-gray-200">
-    <span class="text-sm text-gray-500">Montant total de la ligne :</span>
-    <span class="font-bold text-gray-900">{{ montantCalcule() | currencyFcfa }} </span>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-gray-200">
+    <div class="rounded-lg bg-white border border-gray-200 px-3 py-2">
+      <span class="block text-xs text-gray-500">Coût d'achat</span>
+      <span class="font-bold text-gray-900">{{ montantCalcule() | currencyFcfa }}</span>
+    </div>
+    <div class="rounded-lg bg-fc-green-light border border-green-200 px-3 py-2">
+      <span class="block text-xs text-gray-600">Vente prévisible</span>
+      <span class="font-bold text-fc-green">{{ montantVentePrevisible() | currencyFcfa }}</span>
+    </div>
   </div>
 
   <!-- Submit Button -->

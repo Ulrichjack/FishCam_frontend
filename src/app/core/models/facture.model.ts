@@ -1,4 +1,4 @@
-import { LigneAchatResponse } from "./facture-request.model";
+import { CreateLigneRequest, LigneAchatResponse } from "./facture-request.model";
 
 export interface FactureResponse {
    id:number;
@@ -19,6 +19,7 @@ export interface CreateFactureRequest{
   poissonnerieId: number;
   fournisseurId: number;
   dateAchat: string;
+  lignes: CreateLigneRequest[];
 }
 
 

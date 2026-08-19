@@ -92,21 +92,19 @@ export class FactureFormComponent implements OnInit {
       const factureRequest = {
         poissonnerieId: poissonnerieId,
         fournisseurId: this.factureForm.value.fournisseurId,
-        dateAchat: this.factureForm.value.dateAchat
-      };
-      
-      const factureResponse = await firstValueFrom(this.achatService.createFacture(factureRequest));
-      const factureId = factureResponse.data.id;
-      for (const ligne of this.lignes()) {
-        const ligneRequest = {
+        dateAchat: this.factureForm.value.dateAchat,
+        lignes: this.lignes().map(ligne => ({
           produitId: ligne.produitId,
           quantiteCartons: ligne.quantiteCartons,
           prixUnitaireCarton: ligne.prixUnitaireCarton,
           poidsKg: ligne.poidsKg,
           prixVenteKilo: ligne.prixVenteKilo
-        };
-        await firstValueFrom(this.achatService.addLigne(factureId, ligneRequest));
-      } 
+        }))
+      };
+
+      // Un seul appel : le backend crée l'en-tête et toutes les lignes dans
+      // la même transaction, sans laisser de facture incomplète en cas d'erreur.
+      await firstValueFrom(this.achatService.createFacture(factureRequest));
 
       // 3. Navigate back to the list
       this.router.navigate(['/factures']);

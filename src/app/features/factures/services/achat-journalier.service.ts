@@ -42,6 +42,17 @@ export class AchatJournalierService {
     return this.http.put<ApiResponse<FactureResponse>>(`${this.apiUrl}/${factureId}/cloturer`, {});
   }
 
+  updateFactureDate(factureId: number, dateAchat: string) {
+    return this.http.patch<ApiResponse<FactureResponse>>(
+      `${this.apiUrl}/${factureId}/date`,
+      { dateAchat }
+    );
+  }
+
+  deleteFacture(factureId: number) {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${factureId}`);
+  }
+
   getFactureDetail(factureId: number) {
     return this.http.get<ApiResponse<FactureDetailResponse>>(`${this.apiUrl}/${factureId}`);
   }

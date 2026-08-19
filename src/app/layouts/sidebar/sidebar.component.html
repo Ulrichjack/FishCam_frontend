@@ -8,7 +8,6 @@
   </div>
 
   <!-- Navigation -->
-  <!-- Navigation -->
   <nav class="mt-6 flex-1 overflow-y-auto flex-col space-y-2 pb-4">
 
     <h3 class="px-6 text-xs font-semibold uppercase tracking-wider text-gray-400">Menu</h3>
@@ -28,6 +27,17 @@
         @if(rlaFactures.isActive) { <span class="absolute left-0 h-4/5 w-1 bg-fc-green rounded-r-md"></span> }
         <lucide-icon name="file-text" class="mr-3 h-5 w-5"></lucide-icon> Factures / Achats
       </a>
+      @if(authStore.isPatron() || authStore.isSuperAdmin()) {
+        <a routerLink="/cloture" (click)="closeRequested.emit()" routerLinkActive="text-fc-green font-semibold bg-gray-50" #rlaCloture="routerLinkActive" class="relative flex items-center rounded-md px-6 py-3 font-medium capitalize text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900">
+          @if(rlaCloture.isActive) { <span class="absolute left-0 h-4/5 w-1 bg-fc-green rounded-r-md"></span> }
+          <lucide-icon name="calendar-check" class="mr-3 h-5 w-5"></lucide-icon> Clôture journalière
+        </a>
+      }
+      <!-- Produits -->
+      <a routerLink="/produits" (click)="closeRequested.emit()" routerLinkActive="text-fc-green font-semibold bg-gray-50" #rlaProduits="routerLinkActive" class="relative flex items-center rounded-md px-6 py-3 font-medium capitalize text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900">
+        @if(rlaProduits.isActive) { <span class="absolute left-0 h-4/5 w-1 bg-fc-green rounded-r-md"></span> }
+        <lucide-icon name="package" class="mr-3 h-5 w-5"></lucide-icon> Produits
+      </a>
       <!-- Transactions -->
         @if(authStore.isPatron() || authStore.isSuperAdmin() || authStore.isCaissiere()) {
           <a routerLink="/transactions" (click)="closeRequested.emit()" routerLinkActive="text-fc-green font-semibold bg-gray-50" #rlaTransactions="routerLinkActive" class="relative flex items-center rounded-md px-6 py-3 font-medium capitalize text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900">
@@ -40,24 +50,10 @@
               <lucide-icon name="triangle-alert" class="mr-3 h-5 w-5"></lucide-icon> Comptes en dette
           </a>
         }
-         @if(authStore.isPatron() || authStore.isSuperAdmin()){
-        <!-- cloture journaliere -->
-        <a routerLink="/cloture" (click)="closeRequested.emit()" routerLinkActive="text-fc-green font-semibold bg-gray-50" #rlaCloture="routerLinkActive" class="relative flex items-center rounded-md px-6 py-3 font-medium capitalize text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900">
-              @if(rlaCloture.isActive) { <span class="absolute left-0 h-4/5 w-1 bg-fc-green rounded-r-md"></span> }
-              <lucide-icon name="calendar-check" class="mr-3 h-5 w-5"></lucide-icon> Clôture journalière
-            </a>
-         }
-      
-
       <!-- Livreurs -->
       <a routerLink="/livreurs" (click)="closeRequested.emit()" routerLinkActive="text-fc-green font-semibold bg-gray-50" #rlaLivreurs="routerLinkActive" class="relative flex items-center rounded-md px-6 py-3 font-medium capitalize text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900">
         @if(rlaLivreurs.isActive) { <span class="absolute left-0 h-4/5 w-1 bg-fc-green rounded-r-md"></span> }
         <lucide-icon name="truck" class="mr-3 h-5 w-5"></lucide-icon> Livreurs
-      </a>
-      <!-- Produits -->
-      <a routerLink="/produits" (click)="closeRequested.emit()" routerLinkActive="text-fc-green font-semibold bg-gray-50" #rlaProduits="routerLinkActive" class="relative flex items-center rounded-md px-6 py-3 font-medium capitalize text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900">
-        @if(rlaProduits.isActive) { <span class="absolute left-0 h-4/5 w-1 bg-fc-green rounded-r-md"></span> }
-        <lucide-icon name="package" class="mr-3 h-5 w-5"></lucide-icon> Produits
       </a>
       <!-- Fournisseurs -->
       <a routerLink="/fournisseurs" (click)="closeRequested.emit()" routerLinkActive="text-fc-green font-semibold bg-gray-50" #rlaFournisseurs="routerLinkActive" class="relative flex items-center rounded-md px-6 py-3 font-medium capitalize text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900">

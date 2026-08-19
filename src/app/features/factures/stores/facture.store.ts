@@ -52,4 +52,19 @@ export class FactureStore {
     }
   }
 
+  async deleteFacture(factureId: number) {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    try {
+      await firstValueFrom(this.achatService.deleteFacture(factureId));
+      this._factures.update(list => list.filter(f => f.id !== factureId));
+      this.toastService.success('Facture supprimée avec succès !');
+    } catch (error: any) {
+      this._error.set(error.error?.message || 'Erreur lors de la suppression de la facture');
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
 }

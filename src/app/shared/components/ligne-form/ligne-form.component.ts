@@ -30,6 +30,7 @@ export class LigneFormComponent {
   ligneAdded = output<CreateLigneRequest & { produitNom: string }>();
   selectedProduitNom = signal<string>('');
   montantCalcule = signal<number>(0);
+  montantVentePrevisible = signal<number>(0);
   isLoadingPrix = signal<boolean>(false);
   dernierPrix = signal<DernierPrixResponse | null>(null);
   poidsUnitaireCarton = signal<number>(0);
@@ -49,6 +50,9 @@ export class LigneFormComponent {
       const quantite = values.quantiteCartons || 0;
       const prix = values.prixUnitaireCarton || 0;
       this.montantCalcule.set(quantite * prix);
+      const poids = values.poidsKg || 0;
+      const prixVente = values.prixVenteKilo || 0;
+      this.montantVentePrevisible.set(poids * prixVente);
     });
 
     // NOUVEAU : Écoute SPÉCIFIQUEMENT les changements de quantité pour recalculer le poids total
@@ -57,6 +61,8 @@ export class LigneFormComponent {
       if (unitWeight > 0 && qty) {
         // On met à jour le champ Poids Total sans déclencher une boucle infinie d'événements
         this.ligneForm.patchValue({ poidsKg: qty * unitWeight }, { emitEvent: false });
+        const prixVente = this.ligneForm.get('prixVenteKilo')?.value || 0;
+        this.montantVentePrevisible.set(qty * unitWeight * prixVente);
       }
     });
   }
@@ -64,6 +70,7 @@ export class LigneFormComponent {
   async onProductSelected(produit: ProduitResponse) {
     this.ligneForm.patchValue({ produitId: produit.id });
     this.selectedProduitNom.set(produit.nom);
+    this.dernierPrix.set(null);
 
     // NOUVEAU : On sauvegarde le poids d'un carton
     this.poidsUnitaireCarton.set(produit.poidsParCarton);
@@ -105,7 +112,9 @@ export class LigneFormComponent {
       this.ligneForm.reset({ quantiteCartons: 1 });
       this.selectedProduitNom.set('');
       this.montantCalcule.set(0);
+      this.montantVentePrevisible.set(0);
       this.poidsUnitaireCarton.set(0);
+      this.dernierPrix.set(null);
       
       // 🟢 NOUVEAU : On vide le texte de la barre de recherche !
       if (this.autocompleteComponent) {

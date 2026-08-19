@@ -17,14 +17,27 @@
   <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
 
     <!-- Filters -->
-    <div class="p-4 border-b border-gray-200 bg-gray-50/50 flex gap-4 items-center">
-      <div class="flex items-center gap-2">
+    <div class="p-4 border-b border-gray-200 bg-gray-50/50 flex flex-wrap gap-3 items-center justify-between">
+      <div class="flex flex-wrap items-center gap-2">
         <label class="text-sm font-medium text-gray-700">Date :</label>
-        <!-- DIRECTIVE: Bind this input to selectedDate() and listen to (ngModelChange)="onDateChange($event)" -->
+        <button type="button" (click)="changeDay(-1)"
+                aria-label="Afficher le jour précédent"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 hover:border-fc-green hover:text-fc-green transition-colors">
+          <lucide-icon name="chevron-left" class="h-4 w-4"></lucide-icon>
+        </button>
         <input type="date" 
               class="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none text-sm"
               [ngModel]="selectedDate()" 
               (ngModelChange)="onDateChange($event)">
+        <button type="button" (click)="changeDay(1)"
+                aria-label="Afficher le jour suivant"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 hover:border-fc-green hover:text-fc-green transition-colors">
+          <lucide-icon name="chevron-right" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button type="button" (click)="goToToday()"
+                class="px-3 py-2 rounded-lg text-sm font-medium text-fc-green hover:bg-fc-green-light transition-colors">
+          Aujourd'hui
+        </button>
       </div>
     </div>
 
@@ -81,11 +94,14 @@
                         Clôturer
                       </button>
 
-                      <a routerLink="/cloture"
-                        class="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-black text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
-                        <lucide-icon name="calendar-check" class="h-4 w-4"></lucide-icon>
-                        Aller à la Clôture Journalière
-                      </a>
+                    }
+
+                    @if (!facture.cloture && (authStore.isPatron() || authStore.isSuperAdmin() || authStore.isCaissiere() || authStore.isEnregistreur())) {
+                      <button (click)="openDeleteDialog(facture.id)"
+                              class="flex items-center gap-1.5 px-2 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-red-600 hover:text-white rounded-md transition-colors">
+                        <lucide-icon name="trash-2" class="h-3.5 w-3.5"></lucide-icon>
+                        Supprimer
+                      </button>
                     }
 
 
@@ -118,4 +134,13 @@
   confirmText="Clôturer"
   (cancelled)="isConfirmOpen.set(false)"
   (confirmed)="executeClose()">
+</app-confirm-dialog>
+
+<app-confirm-dialog
+  [isOpen]="isDeleteConfirmOpen()"
+  title="Supprimer la facture"
+  message="Cette facture ouverte et toutes ses lignes seront supprimées définitivement. Continuer ?"
+  confirmText="Supprimer"
+  (cancelled)="isDeleteConfirmOpen.set(false)"
+  (confirmed)="executeDelete()">
 </app-confirm-dialog>

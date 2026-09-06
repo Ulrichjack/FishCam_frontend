@@ -43,6 +43,10 @@ export class ClientService {
     return this.http.post<ApiResponse<void>>(`${this.ccUrl}/emprunts`, data);
   }
 
+  enregistrerDetteInitiale(data:{compteCourantId: number, montant: number, dateDetteOrigine?: string, notes?: string}){
+    return this.http.post<ApiResponse<void>>(`${this.ccUrl}/dettes-initiales`, data);
+  }
+
   enregistrerRemboursement(data:{compteCourantId: number, montant: number, description?: string}){
     return this.http.post<ApiResponse<void>>(`${this.ccUrl}/remboursements`, data);
   }

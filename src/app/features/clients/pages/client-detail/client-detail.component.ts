@@ -35,7 +35,7 @@ export class ClientDetailComponent {
   // Controls which tab is visible: 'courant' or 'epargne'
   activeTab = signal<'courant' | 'epargne'>('courant');
 
-  currentAction = signal<'emprunt' | 'remboursement' | 'depot' | 'retrait' | 'limite' | null>(null);
+  currentAction = signal<'emprunt' | 'dette-initiale' | 'remboursement' | 'depot' | 'retrait' | 'limite' | null>(null);
 
   constructor() {
     // DIRECTIVE: Use effect to reactively load the client when the ID changes
@@ -72,14 +72,14 @@ export class ClientDetailComponent {
     this.activeTab.set(tab);
   }
 
-  openTransactionModal(action: 'emprunt' | 'remboursement' | 'depot' | 'retrait' | 'limite', title: string) {
+  openTransactionModal(action: 'emprunt' | 'dette-initiale' | 'remboursement' | 'depot' | 'retrait' | 'limite', title: string) {
     this.currentAction.set(action);
     this.modalTitle.set(title);
     this.modalError.set(null);
     this.isModalOpen.set(true);
   }
 
-  async onSaveTransaction(data: { amount: number, notes: string }) {
+  async onSaveTransaction(data: { amount: number, notes: string, dateDetteOrigine?: string }) {
     const clientId = this.clientStore.selectedClient()?.id;
     if (!clientId) return;
 
@@ -89,7 +89,7 @@ export class ClientDetailComponent {
       if (action === 'limite') {
         await this.clientStore.modifierLimite(data.amount);
       } else {
-        await this.clientStore.executeTransaction(action!, data.amount, data.notes);
+        await this.clientStore.executeTransaction(action!, data.amount, data.notes, data.dateDetteOrigine);
       }
 
       this.isModalOpen.set(false);

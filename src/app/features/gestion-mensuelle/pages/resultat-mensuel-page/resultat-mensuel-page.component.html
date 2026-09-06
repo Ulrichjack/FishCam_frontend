@@ -39,7 +39,31 @@
     <section class="grid gap-6 xl:grid-cols-[1fr_1fr]">
       <div class="rounded-xl border border-gray-200 bg-white shadow-sm"><div class="flex items-center justify-between border-b border-gray-100 p-5"><div><h2 class="font-bold text-gray-900">Charges du mois</h2><p class="text-xs text-gray-500">Les charges récurrentes reviennent automatiquement.</p></div><button type="button" (click)="ouvrir('charge')" class="rounded-lg border border-fc-green px-3 py-2 text-sm font-bold text-fc-green hover:bg-green-50"><lucide-icon name="plus" class="mr-1 inline h-4 w-4"></lucide-icon>Ajouter</button></div>
         @if(panneau()==='charge'){<form [formGroup]="chargeForm" (ngSubmit)="enregistrerCharge()" class="grid gap-4 border-b border-gray-100 bg-gray-50 p-5 sm:grid-cols-2"><label class="text-sm font-medium text-gray-700">Affectation<select formControlName="poissonnerieId" class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2"><option [ngValue]="null">Entreprise entière</option>@for(p of poissonneries();track p.id){<option [ngValue]="p.id">{{p.name}}</option>}</select></label><label class="text-sm font-medium text-gray-700">Catégorie<select formControlName="categorie" class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2">@for(c of categories;track c.value){<option [value]="c.value">{{c.label}}</option>}</select></label><label class="text-sm font-medium text-gray-700">Libellé<input formControlName="libelle" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" placeholder="Ex. Loyer mensuel"></label><label class="text-sm font-medium text-gray-700">Montant FCFA<input type="number" formControlName="montant" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"></label><label class="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" formControlName="recurrente" class="h-4 w-4 rounded text-fc-green">Se répète chaque mois</label><div class="flex gap-2"><button [disabled]="isSaving()" class="flex-1 rounded-lg bg-fc-green px-4 py-2 text-sm font-bold text-white disabled:opacity-50">{{chargeEnEditionId() ? 'Enregistrer la modification' : 'Enregistrer la charge'}}</button>@if(chargeEnEditionId()){<button type="button" (click)="annulerEdition()" class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-bold text-gray-700">Annuler</button>}</div>@if(chargeEnEditionId()){<p class="sm:col-span-2 text-xs text-amber-800">Le nouveau montant s’appliquera à partir de {{libellePeriode()}} sans modifier les mois précédents.</p>}</form>}
-        <div class="divide-y divide-gray-100">@for(c of charges();track c.id){<div class="flex items-center justify-between gap-3 px-5 py-3"><div><p class="text-sm font-semibold text-gray-900">{{c.libelle}}</p><p class="text-xs text-gray-500">{{c.poissonnerieNom || 'Entreprise entière'}} · {{c.recurrente?'Récurrente':'Ponctuelle'}}</p></div><div class="flex items-center gap-2"><p class="mr-2 font-bold text-gray-900">{{c.montant | currencyFcfa}}</p><button type="button" (click)="modifierCharge(c)" aria-label="Modifier la charge" class="rounded-md border border-gray-300 p-2 text-gray-600 hover:border-fc-green hover:text-fc-green"><lucide-icon name="pencil" class="h-4 w-4"></lucide-icon></button><button type="button" (click)="supprimerCharge(c)" aria-label="Supprimer la charge" class="rounded-md border border-red-200 p-2 text-red-600 hover:bg-red-50"><lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon></button></div></div>}@empty{<p class="p-6 text-center text-sm text-gray-500">Aucune charge enregistrée.</p>}</div>
+        @if(groupesCharges().length){
+          <div class="space-y-4 bg-gray-50/60 p-4">
+            @for(groupe of groupesCharges();track groupe.key){
+              <section class="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                <div class="flex items-center justify-between gap-4 border-b border-gray-100 bg-gray-50 px-4 py-3">
+                  <div><h3 class="font-bold text-gray-900">{{groupe.nom}}</h3><p class="text-xs text-gray-500">{{groupe.charges.length}} charge{{groupe.charges.length>1?'s':''}}</p></div>
+                  <p class="text-base font-black text-fc-green">{{groupe.total|currencyFcfa}}</p>
+                </div>
+                <div class="divide-y divide-gray-100">
+                  @for(c of groupe.charges;track c.id){
+                    <div class="grid grid-cols-[1fr_auto] items-center gap-3 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
+                      <div class="min-w-0"><p class="truncate text-sm font-semibold text-gray-900">{{categorieLabel(c.categorie)}}</p><p class="truncate text-xs text-gray-500">{{c.libelle}}</p></div>
+                      <div class="text-right"><p class="font-bold text-gray-900">{{c.montant|currencyFcfa}}</p><p class="text-xs text-gray-500">{{c.recurrente?'Récurrente':'Ponctuelle'}}</p></div>
+                      <div class="col-span-2 flex justify-end gap-2 sm:col-span-1">
+                        <button type="button" (click)="modifierCharge(c)" [attr.aria-label]="'Modifier '+c.libelle" class="rounded-md border border-gray-300 p-2 text-gray-600 hover:border-fc-green hover:text-fc-green"><lucide-icon name="pencil" class="h-4 w-4"></lucide-icon></button>
+                        <button type="button" (click)="demanderSuppression(c)" [attr.aria-label]="'Supprimer '+c.libelle" class="rounded-md border border-red-200 p-2 text-red-600 hover:bg-red-50"><lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon></button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+            <div class="flex items-center justify-between rounded-xl bg-[#123d20] px-4 py-3 text-white"><span class="text-sm font-semibold">Total des charges du mois</span><span class="text-lg font-black">{{totalCharges()|currencyFcfa}}</span></div>
+          </div>
+        }@else{<p class="p-6 text-center text-sm text-gray-500">Aucune charge enregistrée.</p>}
       </div>
 
       <div class="rounded-xl border border-gray-200 bg-white shadow-sm"><div class="flex items-center justify-between border-b border-gray-100 p-5"><div><h2 class="font-bold text-gray-900">Relevé de fin de mois</h2><p class="text-xs text-gray-500">Un montant global par boutique, après comptage des produits.</p></div><button type="button" (click)="ouvrir('releve')" class="rounded-lg border border-fc-green px-3 py-2 text-sm font-bold text-fc-green hover:bg-green-50"><lucide-icon name="clipboard-list" class="mr-1 inline h-4 w-4"></lucide-icon>Saisir</button></div>
@@ -48,4 +72,14 @@
       </div>
     </section>
   }
+
+  <app-confirm-dialog
+    [isOpen]="chargeASupprimer() !== null"
+    title="Supprimer cette charge ?"
+    [message]="messageSuppressionCharge()"
+    confirmText="Supprimer"
+    cancelText="Conserver"
+    (confirmed)="confirmerSuppression()"
+    (cancelled)="annulerSuppression()">
+  </app-confirm-dialog>
 </div>

@@ -9,6 +9,7 @@ export enum StatutCompteCourant {
 
 export enum TypeTransaction {
   EMPRUNT = 'EMPRUNT',
+  DETTE_INITIALE = 'DETTE_INITIALE',
   REMBOURSEMENT = 'REMBOURSEMENT'
 }
 
@@ -46,5 +47,6 @@ export interface CompteCourantDetailResponse {
   transactions: TransactionCCResponse[];
   nombreTransactions: number;
   totalEmprunts: number;
+  totalDettesInitiales: number;
   totalRemboursements: number;
 }

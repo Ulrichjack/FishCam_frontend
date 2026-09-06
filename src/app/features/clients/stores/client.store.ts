@@ -106,7 +106,7 @@ export class ClientStore {
 
   }
 
-  async executeTransaction(action: TransactionMode, amount: number, notes: string | undefined){
+  async executeTransaction(action: TransactionMode, amount: number, notes: string | undefined, dateDetteOrigine?: string){
      const client = this._selectedClient();
      if(!client) return;
 
@@ -117,6 +117,10 @@ export class ClientStore {
       switch (action){
         case 'emprunt':
           await firstValueFrom(this.clientService.enregistrerEmprunt({compteCourantId: client.compteCourantId, montant: amount, description: notes}));
+          break;
+
+        case 'dette-initiale':
+          await firstValueFrom(this.clientService.enregistrerDetteInitiale({compteCourantId: client.compteCourantId, montant: amount, dateDetteOrigine: dateDetteOrigine || undefined, notes}));
           break;
 
         case 'remboursement':

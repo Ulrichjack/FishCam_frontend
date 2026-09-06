@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, ou
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CurrencyFcfaPipe } from '../../pipes/currency-fcfa.pipe';
 
-export type TransactionMode = 'emprunt' | 'remboursement' | 'depot' | 'retrait' | 'limite';
+export type TransactionMode = 'emprunt' | 'dette-initiale' | 'remboursement' | 'depot' | 'retrait' | 'limite';
 
 
 @Component({
@@ -24,13 +24,16 @@ export class TransactionFormComponent {
     readonly maxAmount = input<number | null>(null);
     
     //outputs
-    readonly  save = output<{amount: number, notes: string}>();
+    readonly  save = output<{amount: number, notes: string, dateDetteOrigine?: string}>();
     readonly cancel = output<void>();
 
     transactionForm: FormGroup = this.fb.group({
       amount: ['', [Validators.required, Validators.min(1)]],
-      notes: ['', [Validators.maxLength(500)]]
+      notes: ['', [Validators.maxLength(500)]],
+      dateDetteOrigine: ['']
     });
+
+    readonly today = this.formatDate(new Date());
 
     onSubmit() {
       if (this.transactionForm.valid) {
@@ -46,6 +49,8 @@ export class TransactionFormComponent {
        switch (this.mode()) {
         case 'emprunt':
           return 'bg-fc-red hover:bg-fc-red-dark';
+        case 'dette-initiale':
+          return 'bg-amber-600 hover:bg-amber-700';
         case 'remboursement':
             return 'bg-fc-green hover:bg-fc-green-dark';
         case 'depot':
@@ -63,6 +68,7 @@ export class TransactionFormComponent {
     readonly buttonText = computed(() => {
       switch (this.mode()) {
         case 'emprunt': return "Enregistrer l'emprunt";
+        case 'dette-initiale': return "Reprendre la dette";
         case 'remboursement': return "Enregistrer le remboursement";
         case 'depot': return "Confirmer le dépôt";
         case 'retrait': return "Confirmer le retrait";
@@ -72,6 +78,7 @@ export class TransactionFormComponent {
     });
 
     readonly requiresDescription = computed(() => this.mode() === 'emprunt');
+    readonly isDetteInitiale = computed(() => this.mode() === 'dette-initiale');
 
     constructor() {
       // This effect runs automatically whenever 'mode()' or 'maxAmount()' changes.
@@ -103,6 +110,10 @@ export class TransactionFormComponent {
         // YOUR CODE HERE
         notesCtrl?.updateValueAndValidity();
       });
+    }
+
+    private formatDate(date: Date): string {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     }
 
 }

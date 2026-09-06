@@ -1,9 +1,11 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse, HttpContextToken } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError, timeout, TimeoutError } from 'rxjs'; // <-- AJOUTE timeout et TimeoutError
 import { AuthStore } from '../stores/auth.store';
 import { ToastService } from '../services/toast.service';
+
+export const SKIP_ERROR_TOAST = new HttpContextToken<boolean>(() => false);
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
    const authStore = inject(AuthStore);
@@ -13,6 +15,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     timeout(10000), // <-- NOUVEAU : Si pas de réponse après 10 secondes, on déclenche une erreur
     catchError((error: any) => {
+
+      if (req.context.get(SKIP_ERROR_TOAST)) {
+        return throwError(() => error);
+      }
 
        if (req.url.includes('/backup/sync-cloud')) {
         return throwError(() => error);

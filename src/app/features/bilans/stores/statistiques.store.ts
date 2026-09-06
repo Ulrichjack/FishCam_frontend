@@ -17,11 +17,11 @@ export class StatistiquesStore {
   readonly isLoading = this._isLoading.asReadonly();
   readonly error = this._error.asReadonly();
 
-  async loadStatsPoissonnerie(poissonnerieId: number) {
+  async loadStatsPoissonnerie(poissonnerieId: number, mois: number, annee: number) {
     this._isLoading.set(true);
     this._error.set(null);
     try {
-      const response = await firstValueFrom(this.statsService.getDashboardStats(poissonnerieId));
+      const response = await firstValueFrom(this.statsService.getDashboardStats(poissonnerieId, mois, annee));
       this._statsPoissonnerie.set(response.data);
     } catch (err: any) {
       this._error.set("Erreur lors du chargement des statistiques.");
@@ -30,11 +30,11 @@ export class StatistiquesStore {
     }
   }
 
-  async loadStatsGlobales() {
+  async loadStatsGlobales(mois: number, annee: number) {
     this._isLoading.set(true);
     this._error.set(null);
     try {
-      const response = await firstValueFrom(this.statsService.getGlobalDashboardStats());
+      const response = await firstValueFrom(this.statsService.getGlobalDashboardStats(mois, annee));
       this._statsGlobales.set(response.data);
     } catch (err: any) {
       this._error.set("Erreur lors du chargement des statistiques globales.");

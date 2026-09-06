@@ -34,7 +34,7 @@
       <form [formGroup]="factureForm" class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Date d'achat *</label>
-          <input type="date" formControlName="dateAchat" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none">
+          <div class="flex items-center rounded-lg border border-gray-300 bg-white p-1"><button type="button" (click)="changePurchaseDate(-1)" aria-label="Jour précédent" class="rounded-md p-1.5 text-gray-600 hover:bg-gray-100"><lucide-icon name="chevron-left" class="h-4 w-4"></lucide-icon></button><input type="date" formControlName="dateAchat" class="min-w-0 flex-1 border-0 bg-transparent px-2 py-1 outline-none focus:ring-0"><button type="button" (click)="changePurchaseDate(1)" aria-label="Jour suivant" class="rounded-md p-1.5 text-gray-600 hover:bg-gray-100"><lucide-icon name="chevron-right" class="h-4 w-4"></lucide-icon></button></div>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Fournisseur *</label>

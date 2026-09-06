@@ -28,7 +28,11 @@
 
       <!-- Filters -->
       <div class="flex gap-3 w-full sm:w-auto">
-        <input type="date" [ngModel]="selectedDate()" (ngModelChange)="selectedDate.set($event)" class="w-full sm:w-auto px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none text-sm text-gray-700">
+        <div class="flex items-center rounded-lg border border-gray-300 bg-white p-1">
+          <button type="button" (click)="changeDate(-1)" aria-label="Jour précédent" class="rounded-md p-1.5 text-gray-600 hover:bg-gray-100"><lucide-icon name="chevron-left" class="h-4 w-4"></lucide-icon></button>
+          <input type="date" [ngModel]="selectedDate()" [max]="today" (ngModelChange)="selectedDate.set($event)" class="w-full sm:w-auto border-0 bg-transparent px-2 py-1 text-sm text-gray-700 outline-none focus:ring-0">
+          <button type="button" (click)="changeDate(1)" [disabled]="!selectedDate() || selectedDate() >= today" aria-label="Jour suivant" class="rounded-md p-1.5 text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-30"><lucide-icon name="chevron-right" class="h-4 w-4"></lucide-icon></button>
+        </div>
         
         <select [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event)" class="w-full sm:w-auto px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none text-sm text-gray-700 bg-white">
           <option value="">Tous les types</option>

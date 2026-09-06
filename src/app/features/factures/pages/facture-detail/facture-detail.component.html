@@ -37,8 +37,9 @@
           <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
             @if (isEditingDate()) {
               <form [formGroup]="dateForm" class="flex items-center gap-2" (ngSubmit)="saveDate()">
-                <input type="date" formControlName="dateAchat"
-                       class="rounded-lg border border-fc-green bg-white px-2 py-1 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-fc-green/30">
+                <button type="button" (click)="changeEditedDate(-1)" aria-label="Jour précédent" class="rounded-md border border-gray-300 p-1 text-gray-600 hover:bg-gray-100"><lucide-icon name="chevron-left" class="h-4 w-4"></lucide-icon></button>
+                <input type="date" formControlName="dateAchat" class="rounded-lg border border-fc-green bg-white px-2 py-1 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-fc-green/30">
+                <button type="button" (click)="changeEditedDate(1)" aria-label="Jour suivant" class="rounded-md border border-gray-300 p-1 text-gray-600 hover:bg-gray-100"><lucide-icon name="chevron-right" class="h-4 w-4"></lucide-icon></button>
                 <button type="submit" [disabled]="dateForm.invalid || isLoading()"
                         class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-fc-green text-white hover:bg-fc-green-dark disabled:opacity-50"
                         aria-label="Enregistrer la nouvelle date">

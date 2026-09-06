@@ -33,6 +33,7 @@ export class TransactionsListComponent implements OnInit {
   readonly searchTerm = signal<string>('');
   readonly selectedType = signal<string>('');
   readonly selectedDate = signal<string>('');
+  readonly today = this.formatDate(new Date());
   readonly currentPage = signal<number>(0);
 
   constructor() {
@@ -105,6 +106,22 @@ export class TransactionsListComponent implements OnInit {
     // YOUR CODE HERE
     const target = event.target as HTMLInputElement;
     this.searchTerm.set(target.value);
+  }
+
+  changeDate(delta: number): void {
+    const base = this.selectedDate() ? this.parseDate(this.selectedDate()) : new Date();
+    base.setDate(base.getDate() + delta);
+    const value = this.formatDate(base);
+    if (value <= this.today) this.selectedDate.set(value);
+  }
+
+  private parseDate(value: string): Date {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  private formatDate(date: Date): string {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
 }

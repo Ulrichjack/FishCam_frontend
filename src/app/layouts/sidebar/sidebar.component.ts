@@ -32,7 +32,7 @@ export class SidebarComponent {
 
   isAdministrationMenuOpen = signal(false);
   isGestionMenuOpen = signal(false);
-  
+
   // Signaux pour la modale de mot de passe
   isPasswordModalOpen = signal(false);
   isLoadingPwd = signal(false);

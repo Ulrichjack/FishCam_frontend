@@ -18,6 +18,10 @@ export interface ClotureJournaliereRequest {
   autresFrais?: number;
   descriptionAutres?: string;
 }
+export interface UpdateClotureJournaliereRequest {
+  argentCaisse: number; fondDeCaisse: number; transport?: number; ration?: number;
+  autresFrais?: number; descriptionAutres?: string; motifCorrection: string;
+}
 
 export interface ClotureJournaliereResponse {
   id: number;
@@ -42,4 +46,8 @@ export interface ClotureJournaliereResponse {
   totalDepenses: number;
   beneficeNet: number;
   createdAt: string;
+  derniereCorrectionMotif?: string;
+  modifieParId?: number;
+  modifieParNom?: string;
+  modifieLe?: string;
 }

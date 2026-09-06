@@ -1,0 +1,33 @@
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+import { LucideAngularModule } from 'lucide-angular';
+import { GestionMensuelleService } from '../../services/gestion-mensuelle.service';
+import { PoissonnerieService } from '../../../admin/services/poissonnerie.service';
+import { PoissonnerieResponse } from '../../../../core/models/poissonnerie-response.model';
+import { ChargeGestion, CategorieCharge, ResultatMensuelGlobal } from '../../../../core/models/gestion-mensuelle.model';
+import { CurrencyFcfaPipe } from '../../../../shared/pipes/currency-fcfa.pipe';
+import { ToastService } from '../../../../core/services/toast.service';
+
+@Component({selector:'app-resultat-mensuel-page',standalone:true,imports:[ReactiveFormsModule,LucideAngularModule,CurrencyFcfaPipe],templateUrl:'./resultat-mensuel-page.component.html',changeDetection:ChangeDetectionStrategy.OnPush})
+export class ResultatMensuelPageComponent implements OnInit {
+  private readonly service=inject(GestionMensuelleService); private readonly shopsService=inject(PoissonnerieService); private readonly toast=inject(ToastService); private readonly fb=inject(FormBuilder);
+  readonly periode=signal(new Date(new Date().getFullYear(),new Date().getMonth(),1)); readonly resultat=signal<ResultatMensuelGlobal|null>(null); readonly poissonneries=signal<PoissonnerieResponse[]>([]); readonly charges=signal<ChargeGestion[]>([]); readonly isLoading=signal(true); readonly isSaving=signal(false); readonly error=signal<string|null>(null); readonly panneau=signal<'releve'|'charge'|null>(null);
+  readonly libellePeriode=computed(()=>new Intl.DateTimeFormat('fr-FR',{month:'long',year:'numeric'}).format(this.periode()));
+  readonly estMoisCourant=computed(()=>{const n=new Date(),p=this.periode();return p.getFullYear()===n.getFullYear()&&p.getMonth()===n.getMonth();});
+  readonly finDuMois=computed(()=>{const p=this.periode();return this.formatDate(new Date(p.getFullYear(),p.getMonth()+1,0));});
+  readonly resultatAffiche=computed(()=>{const r=this.resultat();return r?.resultatValide??r?.resultatCorrigeStock??r?.resultatProvisoire??0;});
+  readonly releveForm=this.fb.group({poissonnerieId:[null as number|null,Validators.required],valeurStock:[null as number|null,[Validators.required,Validators.min(0)]],totalCreancesClients:[null as number|null,Validators.min(0)],modeEvaluation:['COMPTAGE_PHYSIQUE',Validators.required],note:['']});
+  readonly chargeForm=this.fb.group({poissonnerieId:[null as number|null],categorie:['LOYER' as CategorieCharge,Validators.required],libelle:['',[Validators.required,Validators.maxLength(120)]],montant:[null as number|null,[Validators.required,Validators.min(0)]],recurrente:[true],dateFin:['']});
+  readonly categories:{value:CategorieCharge;label:string}[]=[{value:'LOYER',label:'Loyer'},{value:'ELECTRICITE',label:'Électricité'},{value:'TRANSPORT',label:'Transport'},{value:'TAXES',label:'Taxes'},{value:'SALAIRE',label:'Salaires'},{value:'RATION',label:'Ration'},{value:'MANUTENTION',label:'Manutention / livreurs'},{value:'DIRECTION',label:'Direction'},{value:'AUTRE',label:'Autre'}];
+  ngOnInit(){void this.initialiser();}
+  async initialiser(){try{const r=await firstValueFrom(this.shopsService.getAll(0,100));this.poissonneries.set(r.data.content.filter(p=>p.active));if(this.poissonneries().length)this.releveForm.patchValue({poissonnerieId:this.poissonneries()[0].id});await this.charger();}catch{this.error.set('Impossible de charger les données mensuelles.');this.isLoading.set(false);}}
+  async changerMois(delta:number){const p=this.periode(),c=new Date(p.getFullYear(),p.getMonth()+delta,1),max=new Date(new Date().getFullYear(),new Date().getMonth(),1);if(c>max)return;this.periode.set(c);await this.charger();}
+  async charger(){this.isLoading.set(true);this.error.set(null);try{const p=this.periode(),m=p.getMonth()+1,a=p.getFullYear();const result=await firstValueFrom(this.service.resultatGlobal(m,a));this.resultat.set(result.data);const rs=await Promise.all([firstValueFrom(this.service.charges(m,a)),...this.poissonneries().map(s=>firstValueFrom(this.service.charges(m,a,s.id)))]);const u=new Map<number,ChargeGestion>();rs.flatMap(x=>x.data).forEach(c=>u.set(c.id,c));this.charges.set([...u.values()]);}catch{this.error.set('Le résultat mensuel n’a pas pu être calculé.');}finally{this.isLoading.set(false);}}
+  ouvrir(p:'releve'|'charge'){this.panneau.set(this.panneau()===p?null:p);}
+  async enregistrerReleve(){if(this.releveForm.invalid){this.releveForm.markAllAsTouched();return;}this.isSaving.set(true);try{const v=this.releveForm.getRawValue();await firstValueFrom(this.service.enregistrerReleve({poissonnerieId:v.poissonnerieId!,dateReleve:this.finDuMois(),valeurStock:v.valeurStock!,totalCreancesClients:v.totalCreancesClients,modeEvaluation:v.modeEvaluation as 'COMPTAGE_PHYSIQUE'|'ESTIMATION',note:v.note||undefined}));this.toast.success('Relevé de fin de mois enregistré.');this.releveForm.patchValue({valeurStock:null,totalCreancesClients:null,note:''});await this.charger();}catch{this.toast.error('Impossible d’enregistrer le relevé.');}finally{this.isSaving.set(false);}}
+  async enregistrerCharge(){if(this.chargeForm.invalid){this.chargeForm.markAllAsTouched();return;}this.isSaving.set(true);try{const v=this.chargeForm.getRawValue();await firstValueFrom(this.service.creerCharge({poissonnerieId:v.poissonnerieId||null,categorie:v.categorie!,libelle:v.libelle!,montant:v.montant!,recurrente:!!v.recurrente,dateDebut:this.formatDate(this.periode()),dateFin:v.dateFin||null}));this.toast.success('Charge intégrée au résultat.');this.chargeForm.reset({categorie:'LOYER',recurrente:true,poissonnerieId:null,libelle:'',montant:null,dateFin:''});await this.charger();}catch{this.toast.error('Impossible d’enregistrer la charge.');}finally{this.isSaving.set(false);}}
+  async telechargerPdf(){const p=this.periode(),blob=await firstValueFrom(this.service.telechargerPdf(p.getMonth()+1,p.getFullYear())),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Resultat_mensuel_FishCam_${p.getFullYear()}-${String(p.getMonth()+1).padStart(2,'0')}.pdf`;a.click();URL.revokeObjectURL(url);}
+  statutLabel(s:string){return s==='VALIDE'?'Validé':s==='ESTIME'?'Estimé':s==='CORRIGE_STOCK'?'Corrigé par stock':'Provisoire';}
+  private formatDate(d:Date){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+}

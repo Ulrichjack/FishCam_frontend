@@ -1,5 +1,5 @@
 import { BaseChartDirective } from 'ng2-charts';
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { AuthStore } from '../../../../core/stores/auth.store';
 import { StatistiquesStore } from '../../stores/statistiques.store';
 import { CurrencyFcfaPipe } from '../../../../shared/pipes/currency-fcfa.pipe';
@@ -18,6 +18,9 @@ export class StatistiquesPageComponent implements OnInit {
 
   readonly store = inject(StatistiquesStore);
   readonly authStore = inject(AuthStore);
+  readonly periode = signal(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  readonly libellePeriode = computed(() => new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' }).format(this.periode()));
+  readonly estMoisCourant = computed(() => { const n = new Date(), p = this.periode(); return p.getFullYear() === n.getFullYear() && p.getMonth() === n.getMonth(); });
 
   // Configuration de base pour le graphique Chart.js
   public barChartOptions = {
@@ -64,13 +67,27 @@ export class StatistiquesPageComponent implements OnInit {
     // 2. Call store.loadStatsPoissonnerie(id)
     // 3. If authStore.isSuperAdmin() OR authStore.isPatron(), call store.loadStatsGlobales()
     // YOUR CODE HERE
+    this.loadStats();
+  }
+
+  changerMois(delta: number): void {
+    const p = this.periode();
+    const cible = new Date(p.getFullYear(), p.getMonth() + delta, 1);
+    const max = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    if (cible > max) return;
+    this.periode.set(cible);
+    this.loadStats();
+  }
+
+  private loadStats(): void {
     const poissonnerieId = this.authStore.activePoissonnerieId();
+    const p = this.periode();
     if (poissonnerieId) {
-      this.store.loadStatsPoissonnerie(poissonnerieId);
+      this.store.loadStatsPoissonnerie(poissonnerieId, p.getMonth() + 1, p.getFullYear());
     }
 
     if (this.authStore.isSuperAdmin() || this.authStore.isPatron()) {
-      this.store.loadStatsGlobales();
+      this.store.loadStatsGlobales(p.getMonth() + 1, p.getFullYear());
     }
   }
 }

@@ -1,10 +1,11 @@
 // ─── SKELETON: src/app/features/cloture/services/cloture.service.ts ─────────
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse, PageResponse } from '../../../core/models/api-response.model';
-import { ClotureJournaliereRequest, ClotureJournaliereResponse, PreparationClotureResponse } from '../../../core/models/cloture.model';
+import { ClotureJournaliereRequest, ClotureJournaliereResponse, PreparationClotureResponse, UpdateClotureJournaliereRequest } from '../../../core/models/cloture.model';
+import { SKIP_ERROR_TOAST } from '../../../core/auth/error.interceptor';
 
 @Injectable({ providedIn: 'root' })
 export class ClotureService {
@@ -24,6 +25,14 @@ export class ClotureService {
   
   cloturer(request: ClotureJournaliereRequest) {
     return this.http.post<ApiResponse<ClotureJournaliereResponse>>(`${this.apiUrl}`, request);
+  }
+  getCloture(poissonnerieId: number, date: string) {
+    return this.http.get<ApiResponse<ClotureJournaliereResponse>>(this.apiUrl, {
+      params: { poissonnerieId, date }, context: new HttpContext().set(SKIP_ERROR_TOAST, true)
+    });
+  }
+  corriger(id: number, request: UpdateClotureJournaliereRequest) {
+    return this.http.patch<ApiResponse<ClotureJournaliereResponse>>(`${this.apiUrl}/${id}`, request);
   }
 
 

@@ -9,11 +9,11 @@ export class StatistiquesService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/statistiques`;
 
-  getDashboardStats(poissonnerieId: number) {
-    return this.http.get<ApiResponse<StatistiquesPoissonnerieResponse>>(`${this.apiUrl}/poissonneries/${poissonnerieId}/dashboard`);
+  getDashboardStats(poissonnerieId: number, mois: number, annee: number) {
+    return this.http.get<ApiResponse<StatistiquesPoissonnerieResponse>>(`${this.apiUrl}/poissonneries/${poissonnerieId}/dashboard`, { params: { mois, annee } });
   }
 
-  getGlobalDashboardStats() {
-    return this.http.get<ApiResponse<StatistiquesGlobalesResponse>>(`${this.apiUrl}/global`);
+  getGlobalDashboardStats(mois: number, annee: number) {
+    return this.http.get<ApiResponse<StatistiquesGlobalesResponse>>(`${this.apiUrl}/global`, { params: { mois, annee } });
   }
 }

@@ -32,6 +32,7 @@ export const routes: Routes = [
       { path: 'poissonneries', loadComponent: () => import('./features/admin/pages/poissonneries-list/poissonneries-list.component').then(m => m.PoissonneriesListComponent) },
       { path: 'equipe', loadComponent: () => import('./features/admin/pages/equipe-list/equipe-list.component').then(m => m.EquipeListComponent) },
       { path: 'recapitulatifs', loadComponent: () => import('./features/bilans/pages/recapitulatif-page/recapitulatif-page.component').then(m => m.RecapitulatifPageComponent) },
+      { path: 'resultats-mensuels', loadComponent: () => import('./features/gestion-mensuelle/pages/resultat-mensuel-page/resultat-mensuel-page.component').then(m => m.ResultatMensuelPageComponent) },
       { path: 'audit', loadComponent: () => import('./features/admin/pages/audit-list/audit-list.component').then(m => m.AuditListComponent) },
       { path: 'backup', loadComponent: () => import('./features/admin/pages/backup-page/backup-page.component').then(m => m.BackupPageComponent) },
     ]

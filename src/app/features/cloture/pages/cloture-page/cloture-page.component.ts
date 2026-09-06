@@ -33,8 +33,10 @@ export class CloturePageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
 
   // --- STATE SIGNALS ---
-  readonly selectedDate = signal<string>(new Date().toISOString().split('T')[0]);
+  readonly selectedDate = signal<string>(this.formatLocalDate(new Date()));
   readonly isConfirmOpen = signal(false);
+  readonly isCorrectionMode = signal(false);
+  readonly today = this.formatLocalDate(new Date());
 
   // --- FORM ---
   readonly clotureForm: FormGroup = this.fb.group({
@@ -43,7 +45,8 @@ export class CloturePageComponent implements OnInit {
     transport: [0, [Validators.min(0)]],
     ration: [0, [Validators.min(0)]],
     autresFrais: [0, [Validators.min(0)]],
-    descriptionAutres: ['']
+    descriptionAutres: [''],
+    motifCorrection: ['']
   });
 
   // DIRECTIVE: 1. Convert form.valueChanges to a signal using toSignal()
@@ -82,12 +85,7 @@ export class CloturePageComponent implements OnInit {
   });
 
   // Ajoute ceci juste en dessous de "readonly ecart = computed(...)"
-  readonly isAlreadyClosed = computed(() => {
-    const date = this.selectedDate();
-    const page = this.store.historiquePage();
-    if (!page || !page.content) return false;
-    return page.content.some(h => h.date.startsWith(date));
-  });
+  readonly isAlreadyClosed = computed(() => !!this.store.selectedCloture());
 
   onPageChange(page: number) {
     const poissonnerieId = this.authStore.activePoissonnerieId();
@@ -102,7 +100,7 @@ export class CloturePageComponent implements OnInit {
     // YOUR CODE HERE
     effect(() => {
       const preparation = this.store.preparation();
-      if (preparation) {
+      if (preparation && !this.isCorrectionMode() && !this.store.selectedCloture()) {
         this.clotureForm.patchValue({ fondDeCaisse: preparation.fondDeCaisseDefaut }, { emitEvent: false });
       }
     });
@@ -122,7 +120,39 @@ export class CloturePageComponent implements OnInit {
   onDateChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.selectedDate.set(target.value);
+    this.cancelCorrection();
     this.loadData();
+  }
+
+  changeDate(delta: number): void {
+    const [year, month, day] = this.selectedDate().split('-').map(Number);
+    const next = new Date(year, month - 1, day + delta);
+    const value = this.formatLocalDate(next);
+    if (value > this.today) return;
+    this.selectedDate.set(value);
+    this.cancelCorrection();
+    this.loadData();
+  }
+
+  selectHistoryDate(date: string): void {
+    this.selectedDate.set(date.substring(0, 10));
+    this.cancelCorrection();
+    this.loadData();
+  }
+
+  startCorrection(): void {
+    const c = this.store.selectedCloture(); if (!c) return;
+    this.isCorrectionMode.set(true);
+    this.clotureForm.patchValue({ argentCaisse:c.argentCaisse,fondDeCaisse:c.fondDeCaisse,transport:c.transport,ration:c.ration,autresFrais:c.autresFrais,descriptionAutres:c.descriptionAutres,motifCorrection:'' });
+    this.clotureForm.get('motifCorrection')?.setValidators([Validators.required, Validators.minLength(5), Validators.maxLength(500)]);
+    this.clotureForm.get('motifCorrection')?.updateValueAndValidity();
+  }
+
+  cancelCorrection(): void {
+    this.isCorrectionMode.set(false);
+    this.clotureForm.get('motifCorrection')?.clearValidators();
+    this.clotureForm.get('motifCorrection')?.setValue('');
+    this.clotureForm.get('motifCorrection')?.updateValueAndValidity();
   }
 
   openConfirm(): void {
@@ -137,6 +167,11 @@ export class CloturePageComponent implements OnInit {
     const poissonnerieId = this.authStore.activePoissonnerieId();
     if (!poissonnerieId || this.clotureForm.invalid) return;
     const formValues = this.clotureForm.value;
+    if (this.isCorrectionMode()) {
+      const existing = this.store.selectedCloture(); if (!existing) return;
+      await this.store.corrigerCloture(existing.id, { argentCaisse:formValues.argentCaisse, fondDeCaisse:formValues.fondDeCaisse, transport:formValues.transport, ration:formValues.ration, autresFrais:formValues.autresFrais, descriptionAutres:formValues.descriptionAutres, motifCorrection:formValues.motifCorrection }, poissonnerieId, this.selectedDate());
+      this.isConfirmOpen.set(false); this.cancelCorrection(); return;
+    }
     const request = {
       poissonnerieId,
       date: this.selectedDate(),
@@ -151,5 +186,9 @@ export class CloturePageComponent implements OnInit {
     this.isConfirmOpen.set(false);
     // Reset form but keep fondDeCaisse
     this.clotureForm.reset({ fondDeCaisse: formValues.fondDeCaisse });  
+  }
+
+  private formatLocalDate(date: Date): string {
+    return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
   }
 }

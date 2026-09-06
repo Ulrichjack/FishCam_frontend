@@ -7,6 +7,11 @@
       <h1 class="text-2xl font-bold text-gray-900">Tableau de bord - Statistiques</h1>
       <p class="text-sm text-gray-500 mt-1">Analyse détaillée de vos performances commerciales.</p>
     </div>
+    <div class="flex items-center rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
+      <button type="button" (click)="changerMois(-1)" aria-label="Mois précédent" class="rounded-md p-2 text-gray-600 hover:bg-gray-100"><lucide-icon name="chevron-left" class="h-5 w-5"></lucide-icon></button>
+      <span class="min-w-40 px-3 text-center text-sm font-bold capitalize text-gray-900">{{ libellePeriode() }}</span>
+      <button type="button" (click)="changerMois(1)" [disabled]="estMoisCourant()" aria-label="Mois suivant" class="rounded-md p-2 text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-30"><lucide-icon name="chevron-right" class="h-5 w-5"></lucide-icon></button>
+    </div>
   </div>
 
   @if (store.isLoading()) {
@@ -69,7 +74,7 @@
       
       <!-- LE GRAPHIQUE (LAZY LOADED AVEC @DEFER) -->
       <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Revenus Mensuels</h2>
+        <h2 class="text-lg font-bold text-gray-900 mb-4">Revenus de {{ libellePeriode() }}</h2>
         
         <div class="h-72 w-full">
           <!-- C'EST ICI QU'ON UTILISE @DEFER ! -->

@@ -2,8 +2,8 @@
 
 import { inject, Injectable, signal } from "@angular/core";
 import { ClotureService } from "../services/cloture.service";
-import { firstValueFrom } from "rxjs";
-import { ClotureJournaliereRequest, ClotureJournaliereResponse, PreparationClotureResponse } from "../../../core/models/cloture.model";
+import { catchError, firstValueFrom, of } from "rxjs";
+import { ClotureJournaliereRequest, ClotureJournaliereResponse, PreparationClotureResponse, UpdateClotureJournaliereRequest } from "../../../core/models/cloture.model";
 import { ToastService } from "../../../core/services/toast.service";
 import { PageResponse } from "../../../core/models/api-response.model";
 
@@ -15,12 +15,14 @@ export class ClotureStore {
   // --- STATE SIGNALS ---
   private _preparation = signal<PreparationClotureResponse | null>(null);
   private _historiquePage = signal<PageResponse<ClotureJournaliereResponse> | null>(null);
+  private _selectedCloture = signal<ClotureJournaliereResponse | null>(null);
   private _isLoading = signal<boolean>(false);
   private _error = signal<string | null>(null);
 
   // --- READONLY SIGNALS ---
   readonly preparation = this._preparation.asReadonly();
   readonly historiquePage = this._historiquePage.asReadonly();
+  readonly selectedCloture = this._selectedCloture.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
   readonly error = this._error.asReadonly();
 
@@ -30,17 +32,31 @@ export class ClotureStore {
     this._isLoading.set(true);
     this._error.set(null);
     try {
-      const [prepRes, histRes] = await Promise.all([
+      const [prepRes, histRes, clotureRes] = await Promise.all([
         firstValueFrom(this.clotureService.preparerCloture(poissonnerieId, date)),
-        firstValueFrom(this.clotureService.getHistorique(poissonnerieId, page)) // <-- Ajout de page
+        firstValueFrom(this.clotureService.getHistorique(poissonnerieId, page)),
+        firstValueFrom(this.clotureService.getCloture(poissonnerieId, date).pipe(catchError(() => of(null))))
       ]);
       this._preparation.set(prepRes.data);
       this._historiquePage.set(histRes.data); // <-- Modifié
+      this._selectedCloture.set(clotureRes?.data ?? null);
     } catch (error: any) {
       this._error.set(error.message || 'Erreur lors du chargement des données.');
     } finally {
       this._isLoading.set(false);
     }
+  }
+
+  async corrigerCloture(id: number, request: UpdateClotureJournaliereRequest, poissonnerieId: number, date: string) {
+    this._isLoading.set(true); this._error.set(null);
+    try {
+      const response = await firstValueFrom(this.clotureService.corriger(id, request));
+      this._selectedCloture.set(response.data);
+      const histRes = await firstValueFrom(this.clotureService.getHistorique(poissonnerieId, 0));
+      this._historiquePage.set(histRes.data);
+      this.toastService.success('Clôture corrigée. La raison a été enregistrée.');
+    } catch (error: any) { this._error.set(error.message || 'Erreur lors de la correction.'); throw error; }
+    finally { this._isLoading.set(false); }
   }
 
   // 3. Modifie submitCloture

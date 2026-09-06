@@ -8,18 +8,29 @@ import { PoissonnerieResponse } from '../../../../core/models/poissonnerie-respo
 import { ChargeGestion, CategorieCharge, ResultatAnnuel, ResultatMensuelGlobal } from '../../../../core/models/gestion-mensuelle.model';
 import { CurrencyFcfaPipe } from '../../../../shared/pipes/currency-fcfa.pipe';
 import { ToastService } from '../../../../core/services/toast.service';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
-@Component({selector:'app-resultat-mensuel-page',standalone:true,imports:[ReactiveFormsModule,LucideAngularModule,CurrencyFcfaPipe],templateUrl:'./resultat-mensuel-page.component.html',changeDetection:ChangeDetectionStrategy.OnPush})
+@Component({selector:'app-resultat-mensuel-page',standalone:true,imports:[ReactiveFormsModule,LucideAngularModule,CurrencyFcfaPipe,ConfirmDialogComponent],templateUrl:'./resultat-mensuel-page.component.html',changeDetection:ChangeDetectionStrategy.OnPush})
 export class ResultatMensuelPageComponent implements OnInit {
   private readonly service=inject(GestionMensuelleService); private readonly shopsService=inject(PoissonnerieService); private readonly toast=inject(ToastService); private readonly fb=inject(FormBuilder);
   readonly periode=signal(new Date(new Date().getFullYear(),new Date().getMonth(),1)); readonly resultat=signal<ResultatMensuelGlobal|null>(null); readonly poissonneries=signal<PoissonnerieResponse[]>([]); readonly charges=signal<ChargeGestion[]>([]); readonly isLoading=signal(true); readonly isSaving=signal(false); readonly error=signal<string|null>(null); readonly panneau=signal<'releve'|'charge'|null>(null);
   readonly chargeEnEditionId=signal<number|null>(null);
+  readonly chargeASupprimer=signal<ChargeGestion|null>(null);
   readonly currentYear=new Date().getFullYear(); readonly bilanAnnuelOuvert=signal(false); readonly resultatAnnuel=signal<ResultatAnnuel|null>(null); readonly anneeBilan=signal(this.currentYear); readonly isLoadingAnnuel=signal(false);
   readonly resultatAnnuelAffiche=computed(()=>{const r=this.resultatAnnuel();return r?.resultatValide??r?.resultatCorrigeStock??r?.resultatProvisoire??0;});
   readonly libellePeriode=computed(()=>new Intl.DateTimeFormat('fr-FR',{month:'long',year:'numeric'}).format(this.periode()));
   readonly estMoisCourant=computed(()=>{const n=new Date(),p=this.periode();return p.getFullYear()===n.getFullYear()&&p.getMonth()===n.getMonth();});
   readonly finDuMois=computed(()=>{const p=this.periode();return this.formatDate(new Date(p.getFullYear(),p.getMonth()+1,0));});
   readonly resultatAffiche=computed(()=>{const r=this.resultat();return r?.resultatValide??r?.resultatCorrigeStock??r?.resultatProvisoire??0;});
+  readonly groupesCharges=computed(()=>{
+    const charges=this.charges();
+    return [
+      {key:'generales',nom:'Charges générales',charges:charges.filter(c=>!c.poissonnerieId)},
+      ...this.poissonneries().map(p=>({key:`boutique-${p.id}`,nom:p.name,charges:charges.filter(c=>c.poissonnerieId===p.id)}))
+    ].filter(g=>g.charges.length>0).map(g=>({...g,total:g.charges.reduce((s,c)=>s+c.montant,0)}));
+  });
+  readonly totalCharges=computed(()=>this.charges().reduce((s,c)=>s+c.montant,0));
+  readonly messageSuppressionCharge=computed(()=>{const c=this.chargeASupprimer();return c?`Supprimer « ${c.libelle} » ?\nCette charge sera retirée des calculs à partir de ${this.libellePeriode()}.`:'';});
   readonly releveForm=this.fb.group({poissonnerieId:[null as number|null,Validators.required],valeurStock:[null as number|null,[Validators.required,Validators.min(0)]],totalCreancesClients:[null as number|null,Validators.min(0)],modeEvaluation:['COMPTAGE_PHYSIQUE',Validators.required],note:['']});
   readonly chargeForm=this.fb.group({poissonnerieId:[null as number|null],categorie:['LOYER' as CategorieCharge,Validators.required],libelle:['',[Validators.required,Validators.maxLength(120)]],montant:[null as number|null,[Validators.required,Validators.min(0)]],recurrente:[true],dateFin:['']});
   readonly categories:{value:CategorieCharge;label:string}[]=[{value:'LOYER',label:'Loyer'},{value:'ELECTRICITE',label:'Électricité'},{value:'TRANSPORT',label:'Transport'},{value:'TAXES',label:'Taxes'},{value:'SALAIRE',label:'Salaires'},{value:'RATION',label:'Ration'},{value:'MANUTENTION',label:'Manutention / livreurs'},{value:'DIRECTION',label:'Direction'},{value:'AUTRE',label:'Autre'}];
@@ -35,7 +46,10 @@ export class ResultatMensuelPageComponent implements OnInit {
   async enregistrerCharge(){if(this.chargeForm.invalid){this.chargeForm.markAllAsTouched();return;}this.isSaving.set(true);try{const v=this.chargeForm.getRawValue(),request={poissonnerieId:v.poissonnerieId||null,categorie:v.categorie!,libelle:v.libelle!,montant:v.montant!,recurrente:!!v.recurrente,dateDebut:this.formatDate(this.periode()),dateFin:v.dateFin||null};const id=this.chargeEnEditionId();if(id){await firstValueFrom(this.service.modifierCharge(id,request));this.toast.success('Charge modifiée et résultat recalculé.');}else{await firstValueFrom(this.service.creerCharge(request));this.toast.success('Charge intégrée au résultat.');}this.annulerEdition();await this.charger();}catch{this.toast.error('Impossible d’enregistrer la charge.');}finally{this.isSaving.set(false);}}
   modifierCharge(charge:ChargeGestion){this.chargeEnEditionId.set(charge.id);this.panneau.set('charge');this.chargeForm.patchValue({poissonnerieId:charge.poissonnerieId||null,categorie:charge.categorie,libelle:charge.libelle,montant:charge.montant,recurrente:charge.recurrente,dateFin:charge.dateFin||''});}
   annulerEdition(){this.chargeEnEditionId.set(null);this.panneau.set(null);this.chargeForm.reset({categorie:'LOYER',recurrente:true,poissonnerieId:null,libelle:'',montant:null,dateFin:''});}
-  async supprimerCharge(charge:ChargeGestion){if(!window.confirm(`Supprimer « ${charge.libelle} » ? Cette charge sera retirée des calculs.`))return;this.isSaving.set(true);try{await firstValueFrom(this.service.supprimerCharge(charge.id));this.toast.success('Charge supprimée et résultat recalculé.');if(this.chargeEnEditionId()===charge.id)this.annulerEdition();await this.charger();}catch{this.toast.error('Impossible de supprimer la charge.');}finally{this.isSaving.set(false);}}
+  demanderSuppression(charge:ChargeGestion){this.chargeASupprimer.set(charge);}
+  annulerSuppression(){this.chargeASupprimer.set(null);}
+  async confirmerSuppression(){const charge=this.chargeASupprimer();if(!charge)return;this.isSaving.set(true);try{await firstValueFrom(this.service.supprimerCharge(charge.id));this.chargeASupprimer.set(null);this.toast.success('Charge supprimée et résultat recalculé.');if(this.chargeEnEditionId()===charge.id)this.annulerEdition();await this.charger();}catch{this.toast.error('Impossible de supprimer la charge.');}finally{this.isSaving.set(false);}}
+  categorieLabel(categorie:CategorieCharge){return this.categories.find(c=>c.value===categorie)?.label??categorie;}
   async telechargerPdf(){const p=this.periode(),blob=await firstValueFrom(this.service.telechargerPdf(p.getMonth()+1,p.getFullYear())),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Resultat_mensuel_FishCam_${p.getFullYear()}-${String(p.getMonth()+1).padStart(2,'0')}.pdf`;a.click();URL.revokeObjectURL(url);}
   statutLabel(s:string){return s==='VALIDE'?'Validé':s==='ESTIME'?'Estimé':s==='CORRIGE_STOCK'?'Corrigé par stock':'Provisoire';}
   nomMois(mois:number){return new Intl.DateTimeFormat('fr-FR',{month:'long'}).format(new Date(2026,mois-1,1));}

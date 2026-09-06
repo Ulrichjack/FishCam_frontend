@@ -37,6 +37,7 @@
         <select [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event)" class="w-full sm:w-auto px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none text-sm text-gray-700 bg-white">
           <option value="">Tous les types</option>
           <option value="EMPRUNT">EMPRUNT</option>
+          <option value="DETTE_INITIALE">Dette du cahier</option>
           <option value="REMBOURSEMENT">Remboursement</option>
           <option value="DEPOT">Dépôt</option>
           <option value="RETRAIT">Retrait</option>

@@ -90,6 +90,8 @@ export class TransactionsListComponent implements OnInit {
     switch(type) {
       case 'EMPRUNT':
         return 'bg-fc-red-light text-fc-red';
+      case 'DETTE_INITIALE':
+        return 'bg-amber-100 text-amber-800';
       case 'REMBOURSEMENT':
         return 'bg-fc-green-light text-fc-green';
       case 'DEPOT':

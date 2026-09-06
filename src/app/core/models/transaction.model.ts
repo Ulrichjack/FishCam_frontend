@@ -5,7 +5,7 @@ export interface TransactionGlobalResponse{
   dateHeure: string;
   clientNom: string;
   clientTelephone: string;
-  type: 'EMPRUNT' | 'DETTE_INITIALE' | 'REMBOURSEMENT' | 'DEPOT' | 'RETRAIT';
+  type: 'EMPRUNT' | 'DETTE_INITIALE' | 'ANNULATION_DETTE_INITIALE' | 'REMBOURSEMENT' | 'DEPOT' | 'RETRAIT';
   montant: number;
 }
 
@@ -20,6 +20,8 @@ export interface TransactionCCResponse {
   effectuePar: UserResponse;
   transactionDate: string;
   dateDetteOrigine?: string;
+  transactionOrigineId?: number;
+  annulee?: boolean;
   notes:string;
 }
 
@@ -28,5 +30,6 @@ export interface TransactionCCResponse {
 export enum TypeTransaction{
   EMPRUNT = 'EMPRUNT',
   DETTE_INITIALE = 'DETTE_INITIALE',
+  ANNULATION_DETTE_INITIALE = 'ANNULATION_DETTE_INITIALE',
   REMBOURSEMENT = 'REMBOURSEMENT'
 }

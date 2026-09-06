@@ -47,6 +47,10 @@ export class ClientService {
     return this.http.post<ApiResponse<void>>(`${this.ccUrl}/dettes-initiales`, data);
   }
 
+  corrigerDetteInitiale(transactionId:number,data:{nouveauMontant:number,nouvelleDateDetteOrigine?:string,motif:string}){
+    return this.http.post<ApiResponse<void>>(`${this.ccUrl}/dettes-initiales/${transactionId}/correction`,data);
+  }
+
   enregistrerRemboursement(data:{compteCourantId: number, montant: number, description?: string}){
     return this.http.post<ApiResponse<void>>(`${this.ccUrl}/remboursements`, data);
   }

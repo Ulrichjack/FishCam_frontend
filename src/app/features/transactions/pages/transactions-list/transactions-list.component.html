@@ -38,6 +38,7 @@
           <option value="">Tous les types</option>
           <option value="EMPRUNT">EMPRUNT</option>
           <option value="DETTE_INITIALE">Dette du cahier</option>
+          <option value="ANNULATION_DETTE_INITIALE">Annulation dette</option>
           <option value="REMBOURSEMENT">Remboursement</option>
           <option value="DEPOT">Dépôt</option>
           <option value="RETRAIT">Retrait</option>
@@ -92,7 +93,7 @@
 
                 <td>
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" [class]="getTypeBadgeClass(transaction.type)">
-                    {{ transaction.type }}
+                    {{ getTypeLabel(transaction.type) }}
                   </span>
                 </td>
 

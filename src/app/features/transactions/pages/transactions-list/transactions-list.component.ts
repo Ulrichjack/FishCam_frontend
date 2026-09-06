@@ -92,6 +92,8 @@ export class TransactionsListComponent implements OnInit {
         return 'bg-fc-red-light text-fc-red';
       case 'DETTE_INITIALE':
         return 'bg-amber-100 text-amber-800';
+      case 'ANNULATION_DETTE_INITIALE':
+        return 'bg-gray-200 text-gray-700';
       case 'REMBOURSEMENT':
         return 'bg-fc-green-light text-fc-green';
       case 'DEPOT':
@@ -101,6 +103,12 @@ export class TransactionsListComponent implements OnInit {
       default:
         return 'bg-gray-100 text-gray-700';
     }
+  }
+
+  getTypeLabel(type:string):string{
+    if(type==='DETTE_INITIALE')return 'Dette du cahier';
+    if(type==='ANNULATION_DETTE_INITIALE')return 'Annulation dette';
+    return type;
   }
 
   onSearch(event: Event) {

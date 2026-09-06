@@ -195,6 +195,14 @@ export class FactureDetailComponent {
     this.isEditingDate.set(true);
   }
 
+  changeEditedDate(delta: number): void {
+    const value = this.dateForm.get('dateAchat')?.value;
+    if (!value) return;
+    const [year, month, day] = value.split('-').map(Number);
+    const date = new Date(year, month - 1, day + delta);
+    this.dateForm.patchValue({ dateAchat: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` });
+  }
+
   async saveDate() {
     const factureId = this.facture()?.id;
     const dateAchat = this.dateForm.value.dateAchat;

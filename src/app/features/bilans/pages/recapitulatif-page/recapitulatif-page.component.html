@@ -12,11 +12,11 @@
   <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-wrap items-end gap-4">
     <div>
       <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Date de début</label>
-      <input type="date" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)" class="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none text-sm">
+      <div class="flex items-center rounded-lg border border-gray-300 bg-white p-1"><button type="button" (click)="changeDate('start', -1)" aria-label="Début précédent" class="rounded-md p-1.5 text-gray-600 hover:bg-gray-100"><lucide-icon name="chevron-left" class="h-4 w-4"></lucide-icon></button><input type="date" [ngModel]="startDate()" [max]="today" (ngModelChange)="startDate.set($event)" class="border-0 bg-transparent px-2 py-1 text-sm outline-none focus:ring-0"><button type="button" (click)="changeDate('start', 1)" [disabled]="startDate() >= today" aria-label="Début suivant" class="rounded-md p-1.5 text-gray-600 hover:bg-gray-100 disabled:opacity-30"><lucide-icon name="chevron-right" class="h-4 w-4"></lucide-icon></button></div>
     </div>
     <div>
       <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Date de fin</label>
-      <input type="date" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)" class="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none text-sm">
+      <div class="flex items-center rounded-lg border border-gray-300 bg-white p-1"><button type="button" (click)="changeDate('end', -1)" aria-label="Fin précédente" class="rounded-md p-1.5 text-gray-600 hover:bg-gray-100"><lucide-icon name="chevron-left" class="h-4 w-4"></lucide-icon></button><input type="date" [ngModel]="endDate()" [max]="today" (ngModelChange)="endDate.set($event)" class="border-0 bg-transparent px-2 py-1 text-sm outline-none focus:ring-0"><button type="button" (click)="changeDate('end', 1)" [disabled]="endDate() >= today" aria-label="Fin suivante" class="rounded-md p-1.5 text-gray-600 hover:bg-gray-100 disabled:opacity-30"><lucide-icon name="chevron-right" class="h-4 w-4"></lucide-icon></button></div>
     </div>
     <button (click)="generateReport()" [disabled]="store.isLoading()" class="bg-fc-green hover:bg-fc-green-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50">
       @if (store.isLoading()) {

@@ -120,4 +120,12 @@ export class FactureFormComponent implements OnInit {
     this.fournisseurService.getAll().subscribe(res => this.fournisseurs.set(res.data));
   }
 
+  changePurchaseDate(delta: number): void {
+    const value = this.factureForm.get('dateAchat')?.value;
+    if (!value) return;
+    const [year, month, day] = value.split('-').map(Number);
+    const date = new Date(year, month - 1, day + delta);
+    this.factureForm.patchValue({ dateAchat: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` });
+  }
+
 }

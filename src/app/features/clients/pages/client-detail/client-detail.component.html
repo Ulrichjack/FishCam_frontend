@@ -165,24 +165,29 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                   @for (tx of ccDetail.transactions; track tx.id) {
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50" [class.opacity-55]="tx.annulee">
                       <td class="px-4 py-3 text-gray-900">{{ tx.transactionDate | date:'dd/MM/yyyy HH:mm' }}</td>
                       <td class="px-4 py-3">
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
                               [class.bg-fc-red-light]="tx.type === 'EMPRUNT'" [class.text-fc-red]="tx.type === 'EMPRUNT'"
                               [class.bg-fc-green-light]="tx.type === 'REMBOURSEMENT'" [class.text-fc-green]="tx.type === 'REMBOURSEMENT'"
-                              [class.bg-amber-100]="tx.type === 'DETTE_INITIALE'" [class.text-amber-800]="tx.type === 'DETTE_INITIALE'">
-                          {{ tx.type === 'DETTE_INITIALE' ? 'DETTE DU CAHIER' : tx.type }}
+                              [class.bg-amber-100]="tx.type === 'DETTE_INITIALE'" [class.text-amber-800]="tx.type === 'DETTE_INITIALE'"
+                              [class.bg-gray-200]="tx.type === 'ANNULATION_DETTE_INITIALE'" [class.text-gray-700]="tx.type === 'ANNULATION_DETTE_INITIALE'">
+                          {{ libelleTransaction(tx.type) }}
                         </span>
+                        @if(tx.annulee){<span class="ml-1 rounded bg-gray-200 px-2 py-0.5 text-xs font-bold text-gray-600">CORRIGÉE</span>}
                         <div class="mt-1 text-xs text-gray-500">
                           @if (tx.description) { <p>{{ tx.description }}</p> }
                           @if (tx.dateDetteOrigine) { <p>Origine : {{ tx.dateDetteOrigine | date:'dd/MM/yyyy' }}</p> }
                           @if (tx.notes) { <p class="italic text-gray-400">Note: {{ tx.notes }}</p> }
+                          @if(tx.type==='DETTE_INITIALE'&&!tx.annulee&&(authStore.isPatron()||authStore.isSuperAdmin()||authStore.isEnregistreur())){
+                            <button type="button" (click)="ouvrirCorrectionDette(tx)" class="mt-2 rounded-md border border-amber-300 px-2 py-1 font-semibold text-amber-800 hover:bg-amber-50">Corriger</button>
+                          }
                         </div>
                       </td>
                       <td class="px-4 py-3 text-right font-bold"
-                          [class.text-fc-red]="tx.type === 'EMPRUNT'" [class.text-amber-700]="tx.type === 'DETTE_INITIALE'" [class.text-fc-green]="tx.type === 'REMBOURSEMENT'">
-                        {{ tx.type === 'REMBOURSEMENT' ? '+' : '-' }}{{ tx.montant | currencyFcfa }}
+                          [class.text-fc-red]="tx.type === 'EMPRUNT'" [class.text-amber-700]="tx.type === 'DETTE_INITIALE'" [class.text-fc-green]="tx.type === 'REMBOURSEMENT'" [class.text-gray-600]="tx.type === 'ANNULATION_DETTE_INITIALE'">
+                        {{ signeTransaction(tx.type) }}{{ tx.montant | currencyFcfa }}
                       </td>
                       <td class="px-4 py-3 text-right text-gray-600">{{ tx.soldeApres | currencyFcfa }}</td>
                     </tr>
@@ -333,8 +338,29 @@
       }
     </app-modal>
 
+    <app-modal [isOpen]="correctionDetteOpen()" title="Corriger la dette du cahier" (closed)="fermerCorrectionDette()">
+      @if(transactionACorriger();as dette){
+        <form [formGroup]="correctionForm" (ngSubmit)="corrigerDette()" class="space-y-4">
+          <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+            Ancienne valeur : <strong>{{dette.montant|currencyFcfa}}</strong>. FishCam conservera cette ligne et ajoutera une annulation dans l’historique.
+          </div>
+          @if(correctionError()){<p class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{correctionError()}}</p>}
+          <label class="block text-sm font-medium text-gray-700">Nouveau montant FCFA
+            <input type="number" formControlName="nouveauMontant" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-fc-green focus:ring-2 focus:ring-fc-green">
+            <span class="mt-1 block text-xs text-gray-500">Mets 0 pour annuler complètement la dette.</span>
+          </label>
+          <label class="block text-sm font-medium text-gray-700">Date dans le cahier
+            <input type="date" formControlName="nouvelleDateDetteOrigine" [max]="today" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-fc-green focus:ring-2 focus:ring-fc-green">
+          </label>
+          <label class="block text-sm font-medium text-gray-700">Motif de la correction *
+            <textarea formControlName="motif" rows="3" placeholder="Ex. Montant mal recopié depuis le cahier" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-fc-green focus:ring-2 focus:ring-fc-green"></textarea>
+          </label>
+          <div class="flex justify-end gap-2 pt-2"><button type="button" (click)="fermerCorrectionDette()" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700">Conserver</button><button type="submit" [disabled]="correctionForm.invalid||clientStore.isLoading()" class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-bold text-white hover:bg-amber-700 disabled:opacity-50">Enregistrer la correction</button></div>
+        </form>
+      }
+    </app-modal>
+
   }
 
 
 </div>
-

@@ -50,6 +50,8 @@ export class ResultatMensuelPageComponent implements OnInit {
   annulerSuppression(){this.chargeASupprimer.set(null);}
   async confirmerSuppression(){const charge=this.chargeASupprimer();if(!charge)return;this.isSaving.set(true);try{await firstValueFrom(this.service.supprimerCharge(charge.id));this.chargeASupprimer.set(null);this.toast.success('Charge supprimée et résultat recalculé.');if(this.chargeEnEditionId()===charge.id)this.annulerEdition();await this.charger();}catch{this.toast.error('Impossible de supprimer la charge.');}finally{this.isSaving.set(false);}}
   categorieLabel(categorie:CategorieCharge){return this.categories.find(c=>c.value===categorie)?.label??categorie;}
+  creancesCalculeesReleve(){const id=this.releveForm.controls.poissonnerieId.value;return this.resultat()?.boutiques.find(b=>b.poissonnerieId===id)?.creancesClientsCalculees??0;}
+  ecartCreancesReleve(){const declarees=this.releveForm.controls.totalCreancesClients.value;return declarees===null?null:declarees-this.creancesCalculeesReleve();}
   async telechargerPdf(){const p=this.periode(),blob=await firstValueFrom(this.service.telechargerPdf(p.getMonth()+1,p.getFullYear())),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Resultat_mensuel_FishCam_${p.getFullYear()}-${String(p.getMonth()+1).padStart(2,'0')}.pdf`;a.click();URL.revokeObjectURL(url);}
   statutLabel(s:string){return s==='VALIDE'?'Validé':s==='ESTIME'?'Estimé':s==='CORRIGE_STOCK'?'Corrigé par stock':'Provisoire';}
   nomMois(mois:number){return new Intl.DateTimeFormat('fr-FR',{month:'long'}).format(new Date(2026,mois-1,1));}

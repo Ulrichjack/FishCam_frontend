@@ -195,6 +195,23 @@ export class ClientStore {
       }
   }
 
+  async corrigerDetteInitiale(transactionId:number,nouveauMontant:number,nouvelleDateDetteOrigine:string|undefined,motif:string){
+    const client=this._selectedClient();
+    if(!client)return;
+    this._isLoading.set(true);
+    this._error.set(null);
+    try{
+      await firstValueFrom(this.clientService.corrigerDetteInitiale(transactionId,{nouveauMontant,nouvelleDateDetteOrigine:nouvelleDateDetteOrigine||undefined,motif}));
+      await this.loadClientDetail(client.id);
+      this.toastService.success(nouveauMontant===0?'Dette du cahier annulée.':'Dette du cahier corrigée.');
+    }catch(err){
+      this._error.set('Impossible de corriger cette dette.');
+      throw err;
+    }finally{
+      this._isLoading.set(false);
+    }
+  }
+
 
   async deleteClient(clientId: number){
     this._isLoading.set(true);

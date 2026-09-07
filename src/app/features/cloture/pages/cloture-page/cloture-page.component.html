@@ -4,7 +4,7 @@
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Clôture Journalière</h1>
-      <p class="text-sm text-gray-500 mt-1">Vérifiez les ventes et enregistrez la caisse physique.</p>
+      <p class="text-sm text-gray-500 mt-1">Reportez la recette annoncée par le patron et les dépenses du jour.</p>
     </div>
     
     <div class="flex items-center gap-1 bg-white p-1 rounded-lg border border-gray-200 shadow-sm">
@@ -121,7 +121,7 @@
         <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
           <h2 class="font-bold text-gray-900 flex items-center gap-2">
             <lucide-icon name="wallet" class="h-5 w-5 text-fc-green"></lucide-icon>
-            Saisie de la Caisse Physique
+            Saisie du cahier journalier
           </h2>
         </div>
         
@@ -141,10 +141,11 @@
         } @else {
             <form [formGroup]="clotureForm" (ngSubmit)="openConfirm()" class="p-6 flex flex-col gap-5">
               
-              <!-- Argent en caisse -->
+              <!-- Total déclaré : recette du patron + fond de caisse -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Argent total en caisse (FCFA) *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Total déclaré : recette + fond de caisse (FCFA) *</label>
                 <input type="number" formControlName="argentCaisse" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none text-lg font-bold text-gray-900">
+                <p class="mt-1.5 text-xs leading-relaxed text-gray-500">Additionnez la recette annoncée par le patron et le fond de caisse. Ne retirez pas le transport, la ration ou les autres frais : FishCam les déduira séparément du résultat.</p>
                 @if (clotureForm.get('argentCaisse')?.touched && clotureForm.get('argentCaisse')?.invalid) {
                   <p class="text-xs text-fc-red mt-1">Ce champ est requis.</p>
                 }
@@ -156,8 +157,17 @@
                 <input type="number" formControlName="fondDeCaisse" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-fc-green outline-none">
               </div>
 
+              <div class="flex items-center justify-between rounded-lg border border-fc-green/20 bg-fc-green-light px-4 py-3">
+                <span class="text-sm font-medium text-gray-700">Recette prise en compte</span>
+                <span class="font-bold text-fc-green">{{ venteRealisee() | currencyFcfa }}</span>
+              </div>
+
               <div class="h-px bg-gray-200 my-2"></div>
               <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider">Dépenses de la journée</h3>
+
+              <div class="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                Ces montants alimentent automatiquement les dépenses du résultat mensuel. Ne les saisissez pas aussi comme charges mensuelles.
+              </div>
 
               <div class="grid grid-cols-2 gap-4">
                 <div>

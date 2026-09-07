@@ -66,7 +66,7 @@ export class CloturePageComponent implements OnInit {
   // Get totalVentePrevisible from this.store.preparation()
   // YOUR CODE HERE
   readonly ecart = computed(() => {
-    const { argentCaisse, fondDeCaisse, transport, ration, autresFrais } = this.formValues();
+    const { argentCaisse, fondDeCaisse } = this.formValues();
     const preparation = this.store.preparation();
     
     const totalVentePrevisible = preparation ? preparation.totalVentePrevisible : 0;
@@ -74,14 +74,12 @@ export class CloturePageComponent implements OnInit {
     const dettes = preparation ? preparation.montantDettesJour : 0;
     const remboursements = preparation ? preparation.montantRembourseJour : 0;
 
-    // 1. Calculer le total des dépenses
-    const totalDepenses = (transport || 0) + (ration || 0) + (autresFrais || 0);
-    
-    // 2. 🟢 CORRECTION DU BUG : Calculer combien d'argent il DEVRAIT y avoir dans le tiroir
-    const caisseTheorique = (fondDeCaisse || 0) + totalVentePrevisible - dettes + remboursements - totalDepenses;
+    // Le patron communique une recette brute qui inclut déjà l'argent utilisé pour les
+    // dépenses. Celles-ci seront déduites du résultat, sans modifier la vente réalisée.
+    const venteDeclaree = (argentCaisse || 0) - (fondDeCaisse || 0);
+    const ventePrevisibleAjustee = totalVentePrevisible - dettes + remboursements;
 
-    // 3. L'écart est la différence entre le Réel et le Théorique
-    return (argentCaisse || 0) - caisseTheorique;
+    return venteDeclaree - ventePrevisibleAjustee;
   });
 
   // Ajoute ceci juste en dessous de "readonly ecart = computed(...)"
